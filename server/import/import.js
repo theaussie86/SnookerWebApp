@@ -42,7 +42,6 @@ members.forEach(function(m) {
     
     user.save().then((doc) => {
         console.log(`${user.username} mit ID: ${user._id} abgespeichert.`);
-        return user.generateAuthToken();
     }, (err)=> {
         console.log(err);
     });

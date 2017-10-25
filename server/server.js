@@ -4,10 +4,13 @@ const express = require('express');
 const path = require('path');
 const hbs = require('hbs');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
+const session = require('express-session');
 const {ObjectID}=require('mongodb');
 const _ = require('lodash');
 const bcrypt = require('bcryptjs');
 const fs = require('fs');
+const querystring = require('querystring');
 
 const publicPath = path.join(__dirname,'../public');
 const {mongoose} = require('./db/mongoose');
@@ -18,6 +21,13 @@ const {authenticate} = require('./middleware/authenticate');
 
 var app = express();
 
+app.use(cookieParser());
+app.use(session({
+    secret: JWT_SECRET,
+    saveUninitialized: false,
+    resave: false
+}));
+app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 const port = process.env.PORT || 3000;
 
@@ -51,7 +61,7 @@ app.get('/', (req, res) =>{
     });
 });
 
-app.get('/members', (req, res) =>{
+app.get('/members',authenticate,(req, res) =>{
     res.render('members.hbs',{
         title: 'Members'
     });
@@ -99,18 +109,24 @@ app.post('/users', (req,res) => {
 });
 
 app.get('/users/me', authenticate, (req,res)=>{
-    res.send(req.user);
+    res.render(req.user);
 });
 
 app.post('/users/login', (req, res)=>{
-    var body = _.pick(req.body,['email','password']);
+    var body = _.pick(req.body,['username','password']);
 
-    User.findByCredentials(body.email,body.password).then((user)=>{
+    User.findByCredentials(body.username ,body.password).then((user)=>{
         return user.generateAuthToken().then((token)=>{
-            res.header('x-auth', token).send(user);            
+            // app.get('/members',authenticate,(req, res) =>{
+            //     res.render('members.hbs',{
+            //         title: 'Members'
+            //     });
+            // });
+            res.header('x-auth', token).send();
+            // console.log(res._header);      
         });
     }).catch((e)=>{
-        res.status(400).send();
+        res.status(400).send('Login fehlgeschlagen!');
     });
 });
 

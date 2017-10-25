@@ -4,9 +4,9 @@
         <button class="navbar-toggler float-right" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon float-right"></span>
         </button>
-        <div class="collapse navbar-collapse justify-content-between" id="navbarNavAltMarkup">
-            <div class="navbar-nav">
-                <ul class="nav nav-navbar d-flex justify-content-around" role="tablist">
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav justify-content-end">
+                <ul class="nav nav-navbar d-flex" role="tablist">
                     <li class="nav-item">
                         <a class="nav-link active" id="dashboard-tab" data-toggle="tab" href="#dashboard" role="tab" aria-controls="dashboard" aria-expanded="true">Dashboard</a>
                     </li>
@@ -15,10 +15,19 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" id="rechnung-tab" data-toggle="tab" href="#rechnung" role="tab" aria-controls="rechnung">Rechnungsübersicht</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" data-toggle="dropdown" data-target="#LoginModal" href="#">
+                            Hallo <span id="srtUser">Christoph</span>
+                        </a>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="#" role="button" aria-controls="dropdown1">Profil</a>
+                            <a class="dropdown-item" href="#" role="button" aria-controls="dropdown2">Logout</a>
+                        </div>
                     </li>       
                 </ul>
             </div>
-            <div class="navbar-nav">
+            {{!-- <div class="navbar-nav">
                 <ul class="nav navbar-nav d-flex justify-content-end">
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" data-toggle="dropdown" data-target="#LoginModal" href="#">
@@ -31,7 +40,7 @@
                     </li>
                 </ul>
              
-            </div>
+            </div> --}}
         </div>
     </nav>   
 </header>
