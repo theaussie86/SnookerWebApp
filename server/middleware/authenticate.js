@@ -1,8 +1,10 @@
 const {User} = require('./../models/user');
 
 var authenticate = (req, res, next)=>{
-    var token = req.header('x-auth');
-    
+    if(req.user){
+        var token = req.user.tokens[0].token;
+    }
+
         User.findByToken(token).then((user)=>{
             if (!user){
                 return Promise.reject();
@@ -11,8 +13,15 @@ var authenticate = (req, res, next)=>{
             req.token = token;
             next();
         }).catch((err)=>{
-            res.status(401).send();
+            res.status(401).render('home.hbs',{message: 'Kein Zugriff. Erst Einloggen.'});
         });
 };
 
-module.exports= {authenticate};
+var isLoggedIn = (req, res, next)=>{
+    if (req.isAuthenticated()){
+        return next();
+    }
+    res.redirect('/login');
+}
+
+module.exports= {authenticate, isLoggedIn};

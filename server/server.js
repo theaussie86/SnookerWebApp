@@ -1,35 +1,44 @@
 require('./config/config');
 
 const express = require('express');
+const morgan = require('morgan');
 const path = require('path');
 const hbs = require('hbs');
 const bodyParser = require('body-parser');
-const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const {ObjectID}=require('mongodb');
 const _ = require('lodash');
 const bcrypt = require('bcryptjs');
 const fs = require('fs');
-const querystring = require('querystring');
+const flash = require('connect-flash');
+const passport = require('passport');
+const MongoStore = require('connect-mongo')(session);
 
 const publicPath = path.join(__dirname,'../public');
 const {mongoose} = require('./db/mongoose');
 const {User} = require('./models/user');
 const {Rent} = require('./models/rent');
-const {authenticate} = require('./middleware/authenticate');
+const {authenticate, isLoggedIn} = require('./middleware/authenticate');
 
 
 var app = express();
 
-app.use(cookieParser());
+app.use(morgan('dev'));
 app.use(session({
-    secret: JWT_SECRET,
+    secret: 'JWT_SECRET',
     saveUninitialized: false,
-    resave: false
+    resave: false,
+    store: new MongoStore({
+        mongooseConnection: mongoose.connection
+    })
 }));
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(flash());;
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 const port = process.env.PORT || 3000;
+require('./middleware/passport')(passport);
 
 app.set('views',publicPath+'/views');
 hbs.registerPartials(publicPath+ '/views/partials');
@@ -57,13 +66,15 @@ hbs.registerHelper('getCurrentYear',() => {
 
 app.get('/', (req, res) =>{
     res.render('home.hbs',{
-        title: 'Home'
+        title: 'Home',
+        message: req.flash('loginMessage')
     });
 });
 
-app.get('/members',authenticate,(req, res) =>{
+app.get('/members',authenticate, (req, res) =>{
     res.render('members.hbs',{
-        title: 'Members'
+        title: 'Mitglieder',
+        user: req.user
     });
 });
 
@@ -95,16 +106,19 @@ app.get('/users', (req,res) => {
 
 });
 
-app.post('/users', (req,res) => {
+app.post('/register', (req,res) => {
     var body = _.pick(req.body, ['email','password','username']);
     var user = new User (body);
 
     user.save().then(() => {
         return user.generateAuthToken();
-    }).then((token) =>{
-        res.header('x-auth', token).send(user);
+    }).then(() =>{
+        res.render('members.hbs', {
+            title: 'Mitglieder',
+            user: user
+        });
     }).catch((err)=>{
-        res.status(400).send(err);
+        res.status(400).render('home.hbs',{message: 'Fehler beim registrieren. Versuchen Sie es erneut.'});
     });
 });
 
@@ -112,29 +126,18 @@ app.get('/users/me', authenticate, (req,res)=>{
     res.render(req.user);
 });
 
-app.post('/users/login', (req, res)=>{
-    var body = _.pick(req.body,['username','password']);
+app.post('/login', passport.authenticate('login',{
+    successRedirect: '/members',
+    failureRedirect: '/',
+    failureFlash: true
+}));
 
-    User.findByCredentials(body.username ,body.password).then((user)=>{
-        return user.generateAuthToken().then((token)=>{
-            // app.get('/members',authenticate,(req, res) =>{
-            //     res.render('members.hbs',{
-            //         title: 'Members'
-            //     });
-            // });
-            res.header('x-auth', token).send();
-            // console.log(res._header);      
+app.get('/logout', authenticate, (req, res)=>{
+    req.user.removeByToken(req.user.tokens[0].token).then(()=>{
+        req.logout()
+        req.session.destroy((err)=>{
+            res.redirect('/');
         });
-    }).catch((e)=>{
-        res.status(400).send('Login fehlgeschlagen!');
-    });
-});
-
-app.delete('/users/me/token', authenticate, (req, res)=>{
-    req.user.removeByToken(req.token).then(()=>{
-        res.status(200).send();
-    }, ()=>{
-        res.send(400).send();
     });
 });
 

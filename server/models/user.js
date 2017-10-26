@@ -56,8 +56,11 @@ const UserSchema = new mongoose.Schema({
     }],
     Aktiv: {
         type: Boolean,
-        required: true,
         default: true
+    },
+    isBoardMember: {
+        type: Boolean,
+        default: false
     },
     firstname: {
         type : String,
@@ -98,9 +101,9 @@ UserSchema.methods.generateAuthToken = function() {
 
     user.tokens.push({access, token});
 
-    return user.save().then(() => {
-        return token;
-    });
+    return user.save();//.then(() => {
+    //     return token;
+    // });
 };
 
 UserSchema.methods.removeByToken = function(token){
@@ -108,7 +111,7 @@ UserSchema.methods.removeByToken = function(token){
 
     return user.update({
         $pull: {
-            tokens: {token}
+            tokens: {}
         }
     });
 };
