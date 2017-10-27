@@ -89,3 +89,7 @@ img{
  #info{
      text-align: center;
  }
+
+ #formContainer{
+     background-color: rgba(255,255,255,0.8);     
+ }

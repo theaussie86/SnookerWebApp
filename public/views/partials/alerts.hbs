@@ -1,0 +1,18 @@
+    {{#if messages.error}}
+        <div class="alert alert-danger alert-dismissable fixed-bottom">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close" title="close">×</a>
+            {{messages.error}}
+        </div>
+    {{/if}}
+    {{#if messages.info}}
+        <div class="alert alert-info alert-dismissable fixed-bottom">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close" title="close">×</a>
+            {{messages.info}}
+        </div>
+    {{/if}}
+    {{#if messages.success}}
+        <div class="alert alert-success alert-dismissable fixed-bottom">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close" title="close">×</a>
+            {{messages.success}}
+        </div>
+    {{/if}}

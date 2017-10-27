@@ -44,6 +44,8 @@ const UserSchema = new mongoose.Schema({
         trim: true,
         unique : true
     },
+    resetPasswordToken: String,
+    resetPasswordExpires: Date,
     tokens: [{
         access: {
             type: String,
@@ -106,7 +108,7 @@ UserSchema.methods.generateAuthToken = function() {
     // });
 };
 
-UserSchema.methods.removeByToken = function(token){
+UserSchema.methods.removeTokens = function(){
     var user = this;
 
     return user.update({

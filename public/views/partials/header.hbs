@@ -8,11 +8,6 @@
             <div class="navbar-nav">
                 <ul class="nav navbar-nav">
                     {{#if user}}
-                        {{#if user.isBoardMember}}
-                            <li class="nav-item">
-                                <a class="nav-link" data-toggle="modal" data-target="#RegisterModal" href="#RegisterModal">Registrieren</a>
-                            </li>
-                        {{/if}}
                         <li class="nav-item">
                             <a class="nav-link active" id="übersicht-tab" data-toggle="tab" href="#übersicht" role="tab" aria-controls="übersicht" aria-expanded="true">Übersicht</a>
                         </li>
@@ -39,17 +34,14 @@
                             <a class="nav-link" href="#feature-one">Info</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" data-toggle="modal" data-target="#LoginModal" href="#LoginModal">Login</a>
+                            <a class="nav-link" role="button" href="/login">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" role="button" href="/register">Registrieren</a>
                         </li>
                     {{/if}}
                 </ul>             
             </div>
         </div>
     </nav>
-    {{#if message}}
-        <div class="alert alert-danger alert-dismissable fixed-bottom">
-            <a href="#" class="close" data-dismiss="alert" aria-label="close" title="close">×</a>
-            {{message}}
-        </div>
-    {{/if}}
 </header>

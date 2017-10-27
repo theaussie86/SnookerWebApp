@@ -1,4 +1,5 @@
-const localStrategy = require('passport-local');
+const localStrategy = require('passport-local').Strategy;
+const _ = require('lodash');
 const {mongoose} = require('../db/mongoose');
 const bcrypt = require('bcryptjs');
 const {User} = require('../models/user');
@@ -31,6 +32,40 @@ module.exports = function(passport){
                 }
                 user.generateAuthToken();
                 return done(null, user);
+            });
+        });
+    }));
+
+    passport.use('register', new localStrategy({
+        usernameField: 'username',
+        passwordField: 'password',
+        passReqToCallback: true
+    },
+    function(req, username, password, done){
+        process.nextTick(function(){
+            User.findOne({$or: [
+                {email: req.body.email},
+                {username: username}
+            ]}, function(err, user){
+                if (err) return done(err);
+                if (user){
+                    if (user.username === username) {
+                        console.log('Username ist schon vergeben');
+                        return done(null, false, req.flash('registerMessage', 'Der Benutzername ist schon vergeben.'));                        
+                    } else {
+                        console.log('Email ist schon vergeben');
+                        return done(null, false, req.flash('registerMessage', 'Die Emailadresse ist schon vergeben.'));                        
+                    }                    
+                } else {
+                    var body = _.pick(req.body, ['email','password','username']);
+                    var newUser = new User(body);
+
+                    newUser.save(function(err){
+                        if (err) throw err;
+                        return done(null, newUser);
+                    });
+
+                }
             });
         });
     }));
