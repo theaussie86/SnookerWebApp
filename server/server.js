@@ -202,25 +202,18 @@ app.get('/', (req, res) =>{
         app.post('/reset/:token', function(req, res) {
             async.waterfall([
               function(done) {
-                User.findOne({ resetPasswordToken: req.params.token}, function(err, user) {
+                User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires:{ $gt: Date.now()}}, function(err, user) {
                   if (!user) {
-                      console.log('kein User gefunden.',req.params.token);
                     req.flash('error', 'Password reset token is invalid.');
                     return res.redirect('/login');
                   }
-                  if (user.resetPasswordExpires< Date.now()){
-                      console.log(user.resetPasswordExpires.toString()+' : '+ new Date().getTime().toString());
-                      req.flash('error', 'Password reset token is expired.');
-                      return res.redirect('/login');
-                  }
+
                   user.password = req.body.password;
                   user.resetPasswordToken = undefined;
                   user.resetPasswordExpires = undefined;
           
                   user.save(function(err) {
-                    req.logIn(user, function(err) {
-                      done(err, user);
-                    });
+                      done(err, user);                    
                   });
                 });
               },
@@ -250,7 +243,7 @@ app.get('/', (req, res) =>{
                 });
               }
             ], function(err) {
-              res.redirect('/');
+              res.redirect('/login');
             });
           });
 
