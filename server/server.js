@@ -24,8 +24,8 @@ const {User} = require('./models/user');
 const {Break} = require('./models/break');
 const {Rent} = require('./models/rent');
 const {isLoggedIn, isAdmin} = require('./middleware/authenticate');
-const {importSQLData}=require('./db/import/import');
-const {updateBreaksAndRents,updateOldIds}=require('./db/import/update');
+// const {importSQLData}=require('./db/import/import');
+// const {updateBreaksAndRents,updateOldIds}=require('./db/import/update');
 
 var app = express();
 
@@ -65,15 +65,15 @@ app.set('views',publicPath+'/views');
 hbs.registerPartials(publicPath+ '/views/partials');
 app.set('view engine','hbs');
 
-// app.use((req, res, next) => {
-//     var now = new Date().toString();
-//     var log = `${now}: ${req.method} ${req.url}`;
+app.use((req, res, next) => {
+    var now = new Date().toString();
+    var log = `${now}: ${req.method} ${req.url}`;
 
-//     fs.appendFile('server.log',log + '\n', (err) => {
-//         if (err) console.log('Unable to append to server.log.');
-//     });
-//     next();
-// });
+    fs.appendFile('server.log',log + '\n', (err) => {
+        if (err) console.log('Unable to append to server.log.');
+    });
+    next();
+});
 
 // app.use((req, res, next) => {
 //     res.render('maintenance.hbs');
@@ -83,43 +83,6 @@ app.use(express.static(publicPath));
 
 hbs.registerHelper('getCurrentYear',() => {
     return new Date().getFullYear();
-});
-
-// Import der alten Daten
-app.get('/import', (req,res)=>{
-    importSQLData();
-
-    res.render('login.hbs',{'success_msg':'Alle Daten importiert'});
-});
-
-app.get('/update',(req, res)=>{
-    Break.findOne({player: 'Murat'}).then((serie)=>{
-        
-            if (serie.mitID&&!serie._member){
-                console.log('_member ist noch nicht gesetzt');
-                updateBreaksAndRents();
-                res.render('login.hbs',{'success_msg':'_member ist noch nicht gesetzt'});
-                
-            } else if (serie.mitID&&serie._member){
-                console.log('_member ist schon gesetzt, aber mitID gibt es noch');
-                updateOldIds();
-                res.render('login.hbs',{'success_msg':'_member ist schon gesetzt, aber mitID gibt es noch'});
-                
-            } else if (!serie.mitID&&serie._member){
-                console.log('Alles richtig gesetzt');
-                res.render('login.hbs',{'success_msg':'Alles richtig gesetzt'});
-                
-            } else {
-                console.log('Hier stimmt was nicht');
-                throw new Error('Hier stimmt was nicht');
-                res.render('login.hbs',{'error_msg':'Alle Daten importiert'});
-                
-            }
-        
-        }).catch((e)=>{
-            console.log(e);
-            res.render('login.hbs',{'error_msg':e});
-        });
 });
 
 // Homepage

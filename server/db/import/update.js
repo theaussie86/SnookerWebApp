@@ -26,26 +26,42 @@ module.exports.updateOldIds = () => {
     console.log('Alle alten IDs wurden gelöscht');
 };
 
-// Break.findOne({player: 'Murat'}).then((serie)=>{
+// Import der alten Daten
+// app.get('/import', (req,res)=>{
+//     importSQLData();
 
-//     if (serie.mitID&&!serie._member){
-//         console.log('_member ist noch nicht gesetzt');
-//         updateBreaksAndRents();
-//     } else if (serie.mitID&&serie._member){
-//         console.log('_member ist schon gesetzt, aber mitID gibt es noch');
-//         updateOldIds();
-//     } else if (!serie.mitID&&serie._member){
-//         console.log('Alles richtig gesetzt');
-//     } else {
-//         console.log('Hier stimmt was nicht');
-//         throw new Error('Hier stimmt was nicht');
-//     }
-
-// }).catch((e)=>{
-//     console.log(e);
+//     res.render('login.hbs',{'success_msg':'Alle Daten importiert'});
 // });
 
-
+// app.get('/update',(req, res)=>{
+//     Break.findOne({player: 'Murat'}).then((serie)=>{
+        
+//             if (serie.mitID&&!serie._member){
+//                 console.log('_member ist noch nicht gesetzt');
+//                 updateBreaksAndRents();
+//                 res.render('login.hbs',{'success_msg':'_member ist noch nicht gesetzt'});
+                
+//             } else if (serie.mitID&&serie._member){
+//                 console.log('_member ist schon gesetzt, aber mitID gibt es noch');
+//                 updateOldIds();
+//                 res.render('login.hbs',{'success_msg':'_member ist schon gesetzt, aber mitID gibt es noch'});
+                
+//             } else if (!serie.mitID&&serie._member){
+//                 console.log('Alles richtig gesetzt');
+//                 res.render('login.hbs',{'success_msg':'Alles richtig gesetzt'});
+                
+//             } else {
+//                 console.log('Hier stimmt was nicht');
+//                 throw new Error('Hier stimmt was nicht');
+//                 res.render('login.hbs',{'error_msg':'Alle Daten importiert'});
+                
+//             }
+        
+//         }).catch((e)=>{
+//             console.log(e);
+//             res.render('login.hbs',{'error_msg':e});
+//         });
+// });
 
 
 
