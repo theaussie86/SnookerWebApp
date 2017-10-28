@@ -1,11 +1,11 @@
-require('./../config/config');
+require('./../../config/config');
 
-var {mongoose, ObjectID} = require('./../db/mongoose');
-var {Rent} = require('./../models/rent');
-var {Break} = require('./../models/break');
-var {User} = require('./../models/user');
+var {mongoose, ObjectID} = require('./../mongoose');
+var {Rent} = require('./../../models/rent');
+var {Break} = require('./../../models/break');
+var {User} = require('./../../models/user');
 var {members, tischmiete, breaks}= require('./snookerdata');
-
+module.exports.importSQLData=()=>{
 //Befüllen der users-Collection
 members.forEach(function(m) {
     if (m.mgl_end !== 0) {
@@ -82,3 +82,4 @@ breaks.forEach(function(b) {
         });
 
 }, this);
+}

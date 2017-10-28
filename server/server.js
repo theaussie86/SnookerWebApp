@@ -21,15 +21,18 @@ const validator = require('express-validator');
 const publicPath = path.join(__dirname,'../public');
 const {mongoose} = require('./db/mongoose');
 const {User} = require('./models/user');
+const {Break} = require('./models/break');
 const {Rent} = require('./models/rent');
 const {isLoggedIn, isAdmin} = require('./middleware/authenticate');
+const {importSQLData}=require('./db/import/import');
+const {updateBreaksAndRents,updateOldIds}=require('./db/import/update');
 
 var app = express();
 
 // Middleware
 app.use(morgan('dev'));
 app.use(session({
-    secret: 'geileSnookerSession',
+    secret: process.env.JWT_SECRET,
     saveUninitialized: false,
     resave: false,
     store: new MongoStore({
@@ -82,12 +85,48 @@ hbs.registerHelper('getCurrentYear',() => {
     return new Date().getFullYear();
 });
 
+// Import der alten Daten
+app.get('/import', (req,res)=>{
+    importSQLData();
+
+    res.render('login.hbs',{'success_msg':'Alle Daten importiert'});
+});
+
+app.get('/update',(req, res)=>{
+    Break.findOne({player: 'Murat'}).then((serie)=>{
+        
+            if (serie.mitID&&!serie._member){
+                console.log('_member ist noch nicht gesetzt');
+                updateBreaksAndRents();
+                res.render('login.hbs',{'success_msg':'_member ist noch nicht gesetzt'});
+                
+            } else if (serie.mitID&&serie._member){
+                console.log('_member ist schon gesetzt, aber mitID gibt es noch');
+                updateOldIds();
+                res.render('login.hbs',{'success_msg':'_member ist schon gesetzt, aber mitID gibt es noch'});
+                
+            } else if (!serie.mitID&&serie._member){
+                console.log('Alles richtig gesetzt');
+                res.render('login.hbs',{'success_msg':'Alles richtig gesetzt'});
+                
+            } else {
+                console.log('Hier stimmt was nicht');
+                throw new Error('Hier stimmt was nicht');
+                res.render('login.hbs',{'error_msg':'Alle Daten importiert'});
+                
+            }
+        
+        }).catch((e)=>{
+            console.log(e);
+            res.render('login.hbs',{'error_msg':e});
+        });
+});
+
 // Homepage
 app.get('/', (req, res) =>{
     res.render('home.hbs',{
         title: 'Home',
-        user: req.user,
-        message: req.flash('loginMessage')
+        user: req.user
     });
 });
 
@@ -114,9 +153,6 @@ app.get('/', (req, res) =>{
                 req.logout()
                 req.flash('success_msg','Sie haben sich erfolgreich ausgeloggt.');
                 res.redirect('/');
-
-                // req.session.destroy((err)=>{
-                // });
             });
         });
 
@@ -183,8 +219,8 @@ app.get('/', (req, res) =>{
                     port: 25,
                     secure: false,
                     auth: {
-                      user: 'snookertempel@gmail.com',
-                      pass: 'Snooker180'
+                      user: process.env.EMAIL_USER,
+                      pass: process.env.EMAIL_PASS
                     },
                     tls:{
                         rejectUnauthorized:false
@@ -265,9 +301,9 @@ app.get('/', (req, res) =>{
                     port: 25,
                     secure: false,
                     auth: {
-                      user: 'snookertempel@gmail.com',
-                      pass: 'Snooker180'
-                    },
+                        user: process.env.EMAIL_USER,
+                        pass: process.env.EMAIL_PASS
+                      },
                     tls:{
                         rejectUnauthorized:false
                     }

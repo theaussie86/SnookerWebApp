@@ -1,4 +1,4 @@
-const db = require('./../db/snookerdb');
+const db = require('./../snookerdb');
 var members = db.tblMitglieder;
 const memberships = db.tblMitgliedschaften;
 const beitrag = db.tblBeitrag;
