@@ -21,7 +21,8 @@ var isLoggedIn = (req, res, next)=>{
     if (req.isAuthenticated()){
         return next();
     }
-    res.redirect('/');
+    req.flash('error','Du bist nicht eingeloggt.');
+    res.redirect('/login');
 }
 
 module.exports= {authenticate, isLoggedIn};

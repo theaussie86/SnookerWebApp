@@ -19,6 +19,7 @@
         <div id="members" class="py-5">
             <div class="row my-5">
                 <div class="col-md-10 p-1">
+                    {{> alerts}}                    
                     <div class="jumbotron" id="members-caption">
                         <div class="tab-content d-block" id="myTabContent">
                             <div class="tab-pane fade show active" id="übersicht" role="tabpanel" aria-labelledby="übersicht-tab">Übersicht</div>
@@ -34,35 +35,6 @@
                         <button type="button" class="btn btn-secondary">2</button>                  
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <div class="modal fade" id="RegisterModal" tabindex="-1" role="dialog" aria-labelledby="RegisterModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                <h5 class="modal-title" id="RegisterModalLabel">Registrieren Sie ein neues Mitglied</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-                </div>
-                <div class="modal-body">
-                    <form id="registerform" method="POST" action="/register"> 
-                        <div class="form-group">
-                            <label for="username" class="form-control-label">Benutzername:</label>
-                            <input type="text" class="form-control" name="username" id="username" placeholder="Benutzername" autofocus>
-                            <label for="email" class="form-control-label">Email:</label>
-                            <input type="email" class="form-control" name="email" id="email" placeholder="Emailadresse">                            
-                            <label for="password" class="form-control-label">Passwort:</label>
-                            <input type="password" class="form-control" name="password" id="password" placeholder="Passwort"></input>
-                            <label for="password" class="form-control-label">Passwort:</label>
-                            <input type="password" class="form-control" name="password2" id="password2" placeholder="Passwort erneut eingeben"></input>
-                            <hr>
-                            <button type="submit" class="btn btn-success">Anmelden</button>
-                        </div>
-                    </form>                
-                </div>
-            </div>
             </div>
         </div>
 

@@ -1,8 +1,8 @@
 const localStrategy = require('passport-local').Strategy;
 const _ = require('lodash');
-const {mongoose} = require('../db/mongoose');
 const bcrypt = require('bcryptjs');
 const {User} = require('../models/user');
+const passport = require('../server');
 
 module.exports = function(passport){
 
@@ -24,14 +24,15 @@ module.exports = function(passport){
         process.nextTick(function(){
             User.findOne({'username': username}, function(err, user){
                 if (err) return done(err);
-                if (!user) return done(null, false, req.flash('loginMessage','Benutzer nicht gefunden'));
-                if (!bcrypt.compareSync(password, user.password)) return done(null, false, req.flash('loginMessage', 'Password ist falsch. Versuchen Sie es erneut.'));
-                if (!user.Aktiv) return done(null, false, req.flash('loginMessage', 'Sie sind kein aktives Mitglied mehr. Melden Sie sich wieder an.'));
+                if (!user) return done(null, false, req.flash('error_msg','Benutzer nicht gefunden'));
+                if (!bcrypt.compareSync(password, user.password)) return done(null, false, req.flash('error_msg', 'Password ist falsch. Versuchen Sie es erneut.'));
+                if (!user.Aktiv) return done(null, false, req.flash('error_msg', 'Sie sind kein aktives Mitglied mehr. Melden Sie sich wieder an.'));
                 if (user.tokens.length > 0) {
                     User.find({username: user.username}).remove({'access':'auth'}).exec();
                 }
+                
                 user.generateAuthToken();
-                return done(null, user);
+                return done(null, user,req.flash('success_msg','Du hast dich erfolgreich eingeloggt.'));
             });
         });
     }));
@@ -69,4 +70,5 @@ module.exports = function(passport){
             });
         });
     }));
+
 }

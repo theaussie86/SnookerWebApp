@@ -23,7 +23,6 @@ const {User} = require('./models/user');
 const {Rent} = require('./models/rent');
 const {authenticate, isLoggedIn} = require('./middleware/authenticate');
 
-
 var app = express();
 
 // Middleware
@@ -41,24 +40,33 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());;
+
+// Global Variables for flash
+app.use((req, res, next)=>{
+    res.locals.success_msg = req.flash('success_msg');
+    res.locals.error_msg = req.flash('error_msg');
+    res.locals.error = req.flash('error');
+    next();
+});
+
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
-const port = process.env.PORT || 3000;
+app.set('port', (process.env.PORT || 3000));
 require('./middleware/passport')(passport);
 
 app.set('views',publicPath+'/views');
 hbs.registerPartials(publicPath+ '/views/partials');
 app.set('view engine','hbs');
 
-app.use((req, res, next) => {
-    var now = new Date().toString();
-    var log = `${now}: ${req.method} ${req.url}`;
+// app.use((req, res, next) => {
+//     var now = new Date().toString();
+//     var log = `${now}: ${req.method} ${req.url}`;
 
-    fs.appendFile('server.log',log + '\n', (err) => {
-        if (err) console.log('Unable to append to server.log.');
-    });
-    next();
-});
+//     fs.appendFile('server.log',log + '\n', (err) => {
+//         if (err) console.log('Unable to append to server.log.');
+//     });
+//     next();
+// });
 
 // app.use((req, res, next) => {
 //     res.render('maintenance.hbs');
@@ -100,7 +108,7 @@ app.get('/', (req, res) =>{
             req.user.removeTokens().then(()=>{
                 req.logout()
                 req.session.destroy((err)=>{
-                    res.redirect('/');
+                   res.redirect('/');
                 });
             });
         });
@@ -245,16 +253,16 @@ app.get('/', (req, res) =>{
             ], function(err) {
               res.redirect('/login');
             });
-          });
+        });
 
-// Mitgliederseite
+    // Mitgliederseite
     app.get('/members',isLoggedIn, (req, res) =>{
         res.render('members.hbs',{
             title: 'Mitglieder',
             user: req.user
         });
     });
-
+        
     app.get('/board', (req, res) =>{
         res.render('board.hbs',{
             title: 'Vorstand'
@@ -273,8 +281,8 @@ app.get('/', (req, res) =>{
         });
     });
 
-app.listen(port, () => {
-    console.log(`Server started on port ${port}`);
+app.listen(app.get('port'), () => {
+    console.log(`Server started on port ${app.get('port')}`);
 });
 
 module.exports = {app, passport};
