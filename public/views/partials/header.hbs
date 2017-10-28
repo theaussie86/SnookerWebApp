@@ -8,6 +8,11 @@
             <div class="navbar-nav">
                 <ul class="nav navbar-nav">
                     {{#if user}}
+                        {{#if user.isBoardMember}}
+                        <li class="nav-item">
+                            <a class="nav-link" role="button" href="/register">Registrieren</a>
+                        </li>
+                        {{/if}}
                         <li class="nav-item">
                             <a class="nav-link active" id="übersicht-tab" data-toggle="tab" href="#übersicht" role="tab" aria-controls="übersicht" aria-expanded="true">Übersicht</a>
                         </li>
@@ -30,15 +35,13 @@
                             </div>
                         </li> 
                     {{else}}
-                        <li class="nav-item">
-                            <a class="nav-link" href="#feature-one">Info</a>
-                        </li>
+                        {{!-- <li class="nav-item">
+                            <a class="nav-link" href="/feature-one">Info</a>
+                        </li> --}}
                         <li class="nav-item">
                             <a class="nav-link" role="button" href="/login">Login</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" role="button" href="/register">Registrieren</a>
-                        </li>
+
                     {{/if}}
                 </ul>             
             </div>

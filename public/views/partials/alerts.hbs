@@ -1,17 +1,25 @@
-    {{#if error}}
-        <div class="alert alert-danger alert-dismissable ">
+    {{#if errors}}
+        {{#each errors}}
+        <div class="alert small alert-danger alert-dismissable ">
             <a href="#" class="close" data-dismiss="alert" aria-label="close" title="close">×</a>
-            {{error}}
+            {{msg}}
+        </div>
+        {{/each}}
+    {{/if}}
+    {{#if info_msg}}
+        <div class="alert small alert-warning alert-dismissable ">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close" title="close">×</a>
+            {{info_msg}}
         </div>
     {{/if}}
     {{#if error_msg}}
-        <div class="alert alert-danger alert-dismissable ">
+        <div class="alert small alert-danger alert-dismissable ">
             <a href="#" class="close" data-dismiss="alert" aria-label="close" title="close">×</a>
             {{error_msg}}
         </div>
     {{/if}}
     {{#if success_msg}}
-        <div class="alert alert-success alert-dismissable ">
+        <div class="alert small alert-success alert-dismissable ">
             <a href="#" class="close" data-dismiss="alert" aria-label="close" title="close">×</a>
             {{success_msg}}
         </div>

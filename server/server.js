@@ -16,12 +16,13 @@ const MongoStore = require('connect-mongo')(session);
 const nodemailer = require('nodemailer');
 const async = require('async');
 const crypto = require('crypto');
+const validator = require('express-validator');
 
 const publicPath = path.join(__dirname,'../public');
 const {mongoose} = require('./db/mongoose');
 const {User} = require('./models/user');
 const {Rent} = require('./models/rent');
-const {authenticate, isLoggedIn} = require('./middleware/authenticate');
+const {isLoggedIn, isAdmin} = require('./middleware/authenticate');
 
 var app = express();
 
@@ -41,9 +42,12 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());;
 
+app.use(validator());
+
 // Global Variables for flash
 app.use((req, res, next)=>{
     res.locals.success_msg = req.flash('success_msg');
+    res.locals.info_msg = req.flash('info_msg');
     res.locals.error_msg = req.flash('error_msg');
     res.locals.error = req.flash('error');
     next();
@@ -91,13 +95,14 @@ app.get('/', (req, res) =>{
 
     // Login
         app.get('/login',(req,res)=>{
+            
             res.render('login.hbs',{
                 title: 'Login',
                 user: req.user
             });
         });
 
-        app.post('/login', passport.authenticate('login',{
+        app.post('/login', CheckLoginForm, passport.authenticate('login',{
             successRedirect: '/members',
             failureRedirect: '/login',
             failureFlash: true
@@ -107,21 +112,24 @@ app.get('/', (req, res) =>{
         app.get('/logout', isLoggedIn, (req, res)=>{
             req.user.removeTokens().then(()=>{
                 req.logout()
-                req.session.destroy((err)=>{
-                   res.redirect('/');
-                });
+                req.flash('success_msg','Sie haben sich erfolgreich ausgeloggt.');
+                res.redirect('/');
+
+                // req.session.destroy((err)=>{
+                // });
             });
         });
 
     // Register
-        app.get('/register', (req,res)=>{
+        app.get('/register', isAdmin, (req,res)=>{
             res.render('register.hbs',{
                 title: 'Registrieren',
-                user: req.user
+                user: req.user,
+                'info_msg':'Das Passwort muss mindestens eine Ziffer und einen Buchstaben enthalten und mindestens 6 Zeichen lang sein.'                
             });
         });
         
-        app.post('/register', passport.authenticate('register',{
+        app.post('/register', CheckRegisterForm,passport.authenticate('register',{
             successRedirect: '/members',
             failureRedirect: '/register',
             failureFlash: true
@@ -136,6 +144,14 @@ app.get('/', (req, res) =>{
         });
         
         app.post('/forgot',(req,res,next)=>{
+            req.checkBody('username','Das Eingabefeld darf nicht leer sein.').notEmpty();
+            var errors = req.validationErrors();
+            if (errors) {
+                // Render the form using error information
+                res.render('forgot.hbs',{errors: errors});
+            }
+            else {
+               // There are no errors so perform action with valid data (e.g. save record).
             async.waterfall([
                 function(done) {
                   crypto.randomBytes(20, function(err, buf) {
@@ -149,7 +165,7 @@ app.get('/', (req, res) =>{
                     {username: req.body.username}
                 ]}, function(err, user) {
                     if (!user) {
-                      req.flash('error', 'No account with that email address exists.');
+                      req.flash('error_msg', 'Es existiert kein Benutzer mit '+req.body.username+'. Versuche es nochmal.');
                       return res.redirect('/forgot');
                     }
             
@@ -177,14 +193,15 @@ app.get('/', (req, res) =>{
                   var mailOptions = {
                     to: user.email,
                     from: 'snookertempel@gmail.com',
-                    subject: 'Snookertempel Passwort Reset',
-                    text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
-                      'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
+                    subject: 'Passwort zurück setzen!',
+                    text: 'Du hast diese Email bekommen, weil du (oder jemand anderes) das Passwort für dein Account zurück setzen will.\n\n' +
+                      'Bitte klicke auf den folgenden Link oder füge ihn in die Adresszeile deines Browsers ein, um den Prozess abzuschließen:\n\n' +
                       'http://' + req.headers.host + '/reset/' + token + '\n\n' +
-                      'If you did not request this, please ignore this email and your password will remain unchanged.\n'
+                      'Wenn du diese Anfrage nicht geschickt hast, ignoriere bitte diese Email und dein Password wird unverändert bleiben.\n\n'+
+                      'Snookerclub Neubrandenburg'
                   };
                   smtpTransport.sendMail(mailOptions, function(err) {
-                    req.flash('info', 'An e-mail has been sent to ' + user.email + ' with further instructions.');
+                    req.flash('info_msg', 'Wir haben eine Email mit weiteren Anweisungen an '+user.email+' geschrieben.');
                     done(err, 'done');
                   });
                 }
@@ -192,7 +209,9 @@ app.get('/', (req, res) =>{
                 if (err) return next(err);
                 res.redirect('/forgot');
               });
+            }
         });
+    
 
         app.get('/reset/:token',(req,res)=>{
             User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } },(er, user)=>{
@@ -200,19 +219,34 @@ app.get('/', (req, res) =>{
                     req.flash('error','Password Reset Link ist ungültig oder abgelaufen.');
                     return res.redirect('/forgot');
                 }
+
                 res.render('reset.hbs', {
                     title: 'Passwort vergessen',
-                    user: req.user
+                    user: req.user,
+                    'info_msg':'Das Passwort muss mindestens eine Ziffer und einen Buchstaben enthalten und mindestens 6 Zeichen lang sein.'
                 });
-            });
+        });
         });
 
         app.post('/reset/:token', function(req, res) {
+            req.checkBody('password','Passwort darf nicht leer sein.').notEmpty();
+            req.checkBody('password','Das Passwort muss mindestens eine Ziffer und einen Buchstaben enthalten und mindestens 6 Zeichen lang sein.')
+            .matches(/^(?=.*\d)(?=.*[a-z])[0-9a-zA-Z]{6,}$/, "i");    
+            req.checkBody('password2','Die Passwörter müssen überein stimmen.').equals(req.body.password);
+
+            var errors = req.validationErrors();
+            if (errors) {
+                // Render the form using error information
+                res.render('reset.hbs',{errors: errors});
+            }
+            else {
+               // There are no errors so perform action with valid data (e.g. save record).
+                       
             async.waterfall([
               function(done) {
                 User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires:{ $gt: Date.now()}}, function(err, user) {
                   if (!user) {
-                    req.flash('error', 'Password reset token is invalid.');
+                    req.flash('error', 'Der Link zum Zurücksetzen des Passworts ist ungültig.');
                     return res.redirect('/login');
                   }
 
@@ -242,17 +276,19 @@ app.get('/', (req, res) =>{
                     to: user.email,
                     from: 'snookertempel@gmail.com',
                     subject: 'Dein Passwort wurde geändert',
-                    text: 'Hello,\n\n' +
-                    'This is a confirmation that the password for your account ' + user.email + ' has just been changed.\n'
+                    text: 'Hallo,\n\n' +
+                    'Das ist eine Bestätigung, dass das Passwort für dein Konto ' + user.email + ' geändert wurde.\n\n'+
+                    'Snookerclub Neubrandenburg'
                     };
                 smtpTransport.sendMail(mailOptions, function(err) {
-                  req.flash('success', 'Success! Your password has been changed.');
+                  req.flash('success_msg', 'Geschafft! Dein Passwort wurde geändert.');
                   done(err);
                 });
               }
             ], function(err) {
               res.redirect('/login');
             });
+        }
         });
 
     // Mitgliederseite
@@ -285,7 +321,45 @@ app.listen(app.get('port'), () => {
     console.log(`Server started on port ${app.get('port')}`);
 });
 
-module.exports = {app, passport};
+module.exports = {app, passport, validator};
+
+function CheckLoginForm(req, res, next){
+    req.checkBody('username','Der Benutzername darf nicht leer sein.').notEmpty();
+    req.checkBody('password','Das Passwort darf nicht leer sein.').notEmpty();
+    
+    
+        var errors = req.validationErrors();
+        if (errors) {
+            // Render the form using error information
+            res.render('login.hbs',{errors: errors});
+        }
+        else {
+            // There are no errors so perform action with valid data (e.g. save record).
+            next();
+        }
+}
+
+function CheckRegisterForm(req, res, next){
+    req.checkBody('username','Der Benutzername darf nicht leer sein.').notEmpty();
+    req.checkBody('email','Bitte geben Sie eine Emailadresse an.').notEmpty();
+    req.checkBody('password','Das Passwort darf nicht leer sein.').notEmpty();
+    req.checkBody('password','Das Passwort muss mindestens eine Ziffer und einen Buchstaben enthalten und mindestens 6 Zeichen lang sein.')
+        .matches(/^(?=.*\d)(?=.*[a-z])[0-9a-zA-Z]{6,}$/, "i");
+    req.checkBody('password2','Die Passwörter müssen überein stimmen.').equals(req.body.password);
+        
+    
+    
+        var errors = req.validationErrors();
+        if (errors) {
+            // Render the form using error information
+            res.render('register.hbs',{errors: errors});
+        }
+        else {
+            // There are no errors so perform action with valid data (e.g. save record).
+            next();
+        }
+}
+
 
 // User routes
 // app.get('/users', (req,res) => {

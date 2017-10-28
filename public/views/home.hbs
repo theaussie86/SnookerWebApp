@@ -22,33 +22,7 @@
         <div class="container-fluid" id="stage-caption">
             <h1 class="display-3">Willkommen im Snookerclub Neubrandenburg</h1>
             {{> alerts}}
-            <button type="button" class="btn btn-success" data-toggle="modal" data-target="#LoginModal">Melde dich hier an!</button>
-        </div>
-    </div>
-    
-    <div class="modal fade" id="LoginModal" tabindex="-1" role="dialog" aria-labelledby="LoginModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="LoginModalLabel">Anmeldung Mitgliederbereich</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body">
-                <form id="loginform" method="POST" action="/login"> 
-                    <div class="form-group">
-                        <label for="username" class="form-control-label">Benutzername:</label>
-                        <input type="text" class="form-control" name="username" id="username" placeholder="Benutzername" autofocus>
-                        <label for="password" class="form-control-label">Passwort:</label>
-                        <input type="password" class="form-control" name="password" id="password" placeholder="Passwort"></input>
-                        <a href="#">Passwort vergessen?</a>
-                        <hr>
-                        <button type="submit" class="btn btn-success">Anmelden</button>
-                    </div>
-                </form>                
-            </div>
-          </div>
+            <a href="/login"><button type="Link" class="btn btn-success" href="/login">Melde dich hier an!</button></a>
         </div>
     </div>
 
