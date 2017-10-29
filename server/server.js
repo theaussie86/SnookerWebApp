@@ -178,7 +178,7 @@ app.get('/', (req, res) =>{
                 },
                 function(token, user, done) {
                   var smtpTransport = nodemailer.createTransport({
-                    service: 'hotmail',
+                    service: 'gmail',
                     auth: {
                       user: process.env.EMAIL_USER,
                       pass: process.env.EMAIL_PASS
@@ -189,7 +189,7 @@ app.get('/', (req, res) =>{
                   });
                   var mailOptions = {
                     to: user.email,
-                    from: 'christoph.mrasek@hotmail.com',
+                    from: 'snookertempel@gmail.com',
                     subject: 'Passwort zurück setzen!',
                     text: 'Du hast diese Email bekommen, weil du (oder jemand anderes) das Passwort für dein Account zurück setzen will.\n\n' +
                       'Bitte klicke auf den folgenden Link oder füge ihn in die Adresszeile deines Browsers ein, um den Prozess abzuschließen:\n\n' +
@@ -258,7 +258,7 @@ app.get('/', (req, res) =>{
               },
               function(user, done) {
                 var smtpTransport = nodemailer.createTransport({
-                    service: 'hotmail',
+                    service: 'gmail',
                     auth: {
                         user: process.env.EMAIL_USER,
                         pass: process.env.EMAIL_PASS
@@ -269,7 +269,7 @@ app.get('/', (req, res) =>{
                   });
                   var mailOptions = {
                     to: user.email,
-                    from: 'christoph.mrasek@hotmail.com',
+                    from: 'snookertempel@gmail.com',
                     subject: 'Dein Passwort wurde geändert',
                     text: 'Hallo,\n\n' +
                     'Das ist eine Bestätigung, dass das Passwort für dein Konto ' + user.email + ' geändert wurde.\n\n'+
