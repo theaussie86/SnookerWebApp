@@ -286,11 +286,27 @@ app.get('/', (req, res) =>{
         }
         });
 
-    // Mitgliederseite
+        // app.get('/users', (req,res) => {
+        //     User.find().then((users) => {
+        //         res.send({users});
+        //     },(err) => {
+        //         res.status(400).send(err);
+        //     });
+        // });
+
+    // Mitgliederseiten
     app.get('/members',isLoggedIn, (req, res) =>{
+        
         res.render('members.hbs',{
             title: 'Mitglieder',
             user: req.user
+        });
+
+    });
+
+    app.get('/hbreaks',(req,res)=>{
+        Break.find({}).limit(10).sort({break:-1}).then((breaks)=>{
+            res.send(breaks);
         });
     });
         
@@ -340,8 +356,7 @@ function CheckRegisterForm(req, res, next){
     req.checkBody('password','Das Passwort darf nicht leer sein.').notEmpty();
     req.checkBody('password','Das Passwort muss mindestens eine Ziffer und einen Buchstaben enthalten und mindestens 6 Zeichen lang sein.')
         .matches(/^(?=.*\d)(?=.*[a-z])[0-9a-zA-Z]{6,}$/, "i");
-    req.checkBody('password2','Die Passwörter müssen überein stimmen.').equals(req.body.password);
-        
+    req.checkBody('password2','Die Passwörter müssen überein stimmen.').equals(req.body.password);      
     
     
         var errors = req.validationErrors();
@@ -357,13 +372,7 @@ function CheckRegisterForm(req, res, next){
 
 
 // User routes
-// app.get('/users', (req,res) => {
-//     User.find().then((users) => {
-//         res.send({users});
-//     },(err) => {
-//         res.status(400).send(err);
-//     });
-// });
+
 
 
 
