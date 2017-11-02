@@ -68,9 +68,9 @@ img{
 
 #members{
     background: #000000;
-    background-size: cover;
+    /* background-size: cover;
     height: 100%;
-    width: 100%;
+    width: 100%; */
     align-items: center;
 }
 

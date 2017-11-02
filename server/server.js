@@ -304,9 +304,79 @@ app.get('/', (req, res) =>{
 
     });
 
-    app.get('/hbreaks',(req,res)=>{
-        Break.find({}).limit(10).sort({break:-1}).then((breaks)=>{
+    app.get('/dashboard/hbreaks',(req,res)=>{
+        Break.aggregate({$sort:{break:-1}},{$limit: 10},{
+            $project:{
+                _id: false,
+                player: true,
+                break: true,
+                datum: true
+            }
+        }).then((breaks)=>{
             res.send(breaks);
+        },(err)=>{
+            if (err) throw err;
+        });
+    });
+
+    app.get('/dashboard/lbreaks',(req,res)=>{
+        Break.aggregate({$sort:{datum:-1}},{$limit: 10},{
+            $project:{
+                _id: false,
+                player: true,
+                break: true,
+                datum: true
+            }
+        }).then((breaks)=>{
+            res.send(breaks);
+        },(err)=>{
+            if (err) throw err;
+        });
+    });
+
+    app.get('/dashboard/lvisitors',(req,res)=>{
+        Rent.aggregate({$sort:{datum:-1}},{$limit:5},{
+            $project:{
+                _id: false,
+                datum: true,
+                player1: true,
+                player2: true,
+                spielzeit:{$divide:[{$ceil:{$divide:[{$subtract: ["$ende","$start"]},360000]}},10]}
+            }
+        }).then((rents)=>{
+            res.send(rents);
+        },(err)=>{
+            if (err) throw err;
+        });
+    });
+
+    app.get('/dashboard/lastmonths',(req,res)=>{
+         
+        Rent.aggregate({
+            $project:{
+                _id: false,
+                datum: true,
+                year:{$year:"$datum"},
+                month:{$month: "$datum"},
+                betrag:{$divide:[{$ceil:{$multiply:[{$divide:[{$subtract: ["$ende","$start"]},360000]},3.5]}},10]}                
+            }
+        },{
+            $match:{
+                year: new Date(2016,5,13).getFullYear(),
+                $or:[{month:new Date(2016,5,13).getMonth()},{month:new Date(2016,5,13).getMonth()-1}]                
+            }
+        },{
+            $group:{
+                _id: "$month",
+                umsatz: {$sum: "$betrag"}
+            }
+        }).then((rents)=>{
+            if (!rents) {
+                return res.status(404).send('keine ergebnisse gefunden');
+            }
+            res.send(rents);
+        }).catch((e)=>{
+            console.log(e);
         });
     });
         
