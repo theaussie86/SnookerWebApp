@@ -1,6 +1,7 @@
 require('./../../config/config');
+const {ObjectId} = require('mongoose');
 
-var {mongoose, ObjectID} = require('./../mongoose');
+var {mongoose} = require('./../mongoose');
 var {Rent} = require('./../../models/rent');
 var {Break} = require('./../../models/break');
 var {User} = require('./../../models/user');
@@ -56,8 +57,14 @@ tischmiete.forEach(function(r) {
         player1: r.tim_spieler1,
         player2: r.tim_spieler2,
         start: new Date(r.tim_anf),
-        ende: new Date(r.tim_end)
+        ende: new Date(r.tim_end),
+        _member: new mongoose.Types.ObjectId()
     });
+
+    if (rent.ende<rent.start){
+        console.log('Endzeit um einen Tag erhöht.');
+        rent.ende.setDate(rent.ende.getDate()+1);
+    }
     rent.save().then((doc)=>{
         console.log('SAVED: '+r.tim_spieler1+' - '+r.tim_spieler2);
     }, (err) =>{

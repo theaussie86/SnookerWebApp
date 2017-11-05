@@ -32,7 +32,7 @@ module.exports = function(passport){
                 }
                 
                 user.generateAuthToken();
-                return done(null, user,req.flash('success_msg','Du hast dich erfolgreich eingeloggt.'));
+                return done(null, user);
             });
         });
     }));

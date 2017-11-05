@@ -23,9 +23,8 @@ const {mongoose} = require('./db/mongoose');
 const {User} = require('./models/user');
 const {Break} = require('./models/break');
 const {Rent} = require('./models/rent');
+const {importRouter} = require('./routes/import');
 const {isLoggedIn, isAdmin} = require('./middleware/authenticate');
-// const {importSQLData}=require('./db/import/import');
-// const {updateBreaksAndRents,updateOldIds}=require('./db/import/update');
 
 var app = express();
 
@@ -45,7 +44,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());;
 
-app.use(validator());
+// Middleware for Routes
+app.use('/import',importRouter);
 
 // Global Variables for flash
 app.use((req, res, next)=>{
@@ -58,6 +58,7 @@ app.use((req, res, next)=>{
 
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
+app.use(validator());
 app.set('port', (process.env.PORT || 3000));
 require('./middleware/passport')(passport);
 
@@ -85,206 +86,209 @@ hbs.registerHelper('getCurrentYear',() => {
     return new Date().getFullYear();
 });
 
+
+
+// Login, Logout, Register, Reset
 // Homepage
-app.get('/', (req, res) =>{
+app.get('/',(req,res)=>{
     res.render('home.hbs',{
         title: 'Home',
         user: req.user
     });
 });
 
-// Login, Logout, Register, Reset
+// Login
+app.get('/login',(req,res)=>{
+    
+    res.render('login.hbs',{
+        title: 'Login',
+        user: req.user
+    });
+});
 
-    // Login
-        app.get('/login',(req,res)=>{
-            
-            res.render('login.hbs',{
-                title: 'Login',
-                user: req.user
-            });
+app.post('/login', CheckLoginForm, passport.authenticate('login',{
+    successRedirect: '/members',
+    failureRedirect: '/login',
+    failureFlash: true
+}));
+
+// Logout
+    app.get('/logout', isLoggedIn, (req, res)=>{
+        req.user.removeTokens().then(()=>{
+            req.logout()
+            req.flash('success_msg','Sie haben sich erfolgreich ausgeloggt.');
+            res.redirect('/');
         });
+    });
 
-        app.post('/login', CheckLoginForm, passport.authenticate('login',{
-            successRedirect: '/members',
-            failureRedirect: '/login',
-            failureFlash: true
-        }));
-
-    // Logout
-        app.get('/logout', isLoggedIn, (req, res)=>{
-            req.user.removeTokens().then(()=>{
-                req.logout()
-                req.flash('success_msg','Sie haben sich erfolgreich ausgeloggt.');
-                res.redirect('/');
-            });
+// Register
+    app.get('/register', isAdmin, (req,res)=>{
+        res.render('register.hbs',{
+            title: 'Registrieren',
+            user: req.user,
+            'info_msg':'Das Passwort muss mindestens eine Ziffer und einen Buchstaben enthalten und mindestens 6 Zeichen lang sein.'                
         });
+    });
+    
+    app.post('/register', CheckRegisterForm,passport.authenticate('register',{
+        successRedirect: '/members',
+        failureRedirect: '/register',
+        failureFlash: true
+    }));
 
-    // Register
-        app.get('/register', isAdmin, (req,res)=>{
-            res.render('register.hbs',{
-                title: 'Registrieren',
-                user: req.user,
-                'info_msg':'Das Passwort muss mindestens eine Ziffer und einen Buchstaben enthalten und mindestens 6 Zeichen lang sein.'                
-            });
+// Reset
+    app.get('/forgot',(req,res)=>{
+        res.render('forgot.hbs',{
+            title: 'Passwort vergessen',
+            user: req.user
         });
-        
-        app.post('/register', CheckRegisterForm,passport.authenticate('register',{
-            successRedirect: '/members',
-            failureRedirect: '/register',
-            failureFlash: true
-        }));
-
-    // Reset
-        app.get('/forgot',(req,res)=>{
-            res.render('forgot.hbs',{
-                title: 'Passwort vergessen',
-                user: req.user
-            });
-        });
-        
-        app.post('/forgot',(req,res,next)=>{
-            req.checkBody('username','Das Eingabefeld darf nicht leer sein.').notEmpty();
-            var errors = req.validationErrors();
-            if (errors) {
-                // Render the form using error information
-                res.render('forgot.hbs',{errors: errors});
-            }
-            else {
-               // There are no errors so perform action with valid data (e.g. save record).
-            async.waterfall([
-                function(done) {
-                  crypto.randomBytes(20, function(err, buf) {
-                    var token = buf.toString('hex');
-                    done(err, token);
-                  });
-                },
-                function(token, done) {
-                  User.findOne({$or: [
-                    {email: req.body.username},
-                    {username: req.body.username}
-                ]}, function(err, user) {
-                    if (!user) {
-                      req.flash('error_msg', 'Es existiert kein Benutzer mit '+req.body.username+'. Versuche es nochmal.');
-                      return res.redirect('/forgot');
-                    }
-            
-                    user.resetPasswordToken = token;
-                    user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
-            
-                    user.save(function(err) {
-                      done(err, token, user);
-                    });
-                  });
-                },
-                function(token, user, done) {
-                  var smtpTransport = nodemailer.createTransport({
-                    service: 'gmail',
-                    auth: {
-                      user: process.env.EMAIL_USER,
-                      pass: process.env.EMAIL_PASS
-                    },
-                    tls:{
-                        rejectUnauthorized:false
-                    }
-                  });
-                  var mailOptions = {
-                    to: user.email,
-                    from: 'snookertempel@gmail.com',
-                    subject: 'Passwort zurück setzen!',
-                    text: 'Du hast diese Email bekommen, weil du (oder jemand anderes) das Passwort für dein Account zurück setzen will.\n\n' +
-                      'Bitte klicke auf den folgenden Link oder füge ihn in die Adresszeile deines Browsers ein, um den Prozess abzuschließen:\n\n' +
-                      'http://' + req.headers.host + '/reset/' + token + '\n\n' +
-                      'Wenn du diese Anfrage nicht geschickt hast, ignoriere bitte diese Email und dein Password wird unverändert bleiben.\n\n'+
-                      'Snookerclub Neubrandenburg'
-                  };
-                  smtpTransport.sendMail(mailOptions, function(err) {
-                    req.flash('info_msg', 'Wir haben eine Email mit weiteren Anweisungen an '+user.email+' geschrieben.');
-                    done(err, 'done');
-                  });
+    });
+    
+    app.post('/forgot',(req,res,next)=>{
+        req.checkBody('username','Das Eingabefeld darf nicht leer sein.').notEmpty();
+        var errors = req.validationErrors();
+        if (errors) {
+            // Render the form using error information
+            res.render('forgot.hbs',{errors: errors});
+        }
+        else {
+           // There are no errors so perform action with valid data (e.g. save record).
+        async.waterfall([
+            function(done) {
+              crypto.randomBytes(20, function(err, buf) {
+                var token = buf.toString('hex');
+                done(err, token);
+              });
+            },
+            function(token, done) {
+              User.findOne({$or: [
+                {email: req.body.username},
+                {username: req.body.username}
+            ]}, function(err, user) {
+                if (!user) {
+                  req.flash('error_msg', 'Es existiert kein Benutzer mit '+req.body.username+'. Versuche es nochmal.');
+                  return res.redirect('/forgot');
                 }
-              ], function(err) {
-                if (err) return next(err);
-                res.redirect('/forgot');
+        
+                user.resetPasswordToken = token;
+                user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+        
+                user.save(function(err) {
+                  done(err, token, user);
+                });
+              });
+            },
+            function(token, user, done) {
+              var smtpTransport = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                  user: process.env.EMAIL_USER,
+                  pass: process.env.EMAIL_PASS
+                },
+                tls:{
+                    rejectUnauthorized:false
+                }
+              });
+              var mailOptions = {
+                to: user.email,
+                from: 'snookertempel@gmail.com',
+                subject: 'Passwort zurück setzen!',
+                text: 'Du hast diese Email bekommen, weil du (oder jemand anderes) das Passwort für dein Account zurück setzen will.\n\n' +
+                  'Bitte klicke auf den folgenden Link oder füge ihn in die Adresszeile deines Browsers ein, um den Prozess abzuschließen:\n\n' +
+                  'http://' + req.headers.host + '/reset/' + token + '\n\n' +
+                  'Wenn du diese Anfrage nicht geschickt hast, ignoriere bitte diese Email und dein Password wird unverändert bleiben.\n\n'+
+                  'Snookerclub Neubrandenburg'
+              };
+              smtpTransport.sendMail(mailOptions, function(err) {
+                req.flash('info_msg', 'Wir haben eine Email mit weiteren Anweisungen an '+user.email+' geschrieben.');
+                done(err, 'done');
               });
             }
-        });
-    
-
-        app.get('/reset/:token',(req,res)=>{
-            User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } },(er, user)=>{
-                if (!user) {
-                    req.flash('error','Password Reset Link ist ungültig oder abgelaufen.');
-                    return res.redirect('/forgot');
-                }
-
-                res.render('reset.hbs', {
-                    title: 'Passwort vergessen',
-                    user: req.user,
-                    'info_msg':'Das Passwort muss mindestens eine Ziffer und einen Buchstaben enthalten und mindestens 6 Zeichen lang sein.'
-                });
-        });
-        });
-
-        app.post('/reset/:token', function(req, res) {
-            req.checkBody('password','Passwort darf nicht leer sein.').notEmpty();
-            req.checkBody('password','Das Passwort muss mindestens eine Ziffer und einen Buchstaben enthalten und mindestens 6 Zeichen lang sein.')
-            .matches(/^(?=.*\d)(?=.*[a-z])[0-9a-zA-Z]{6,}$/, "i");    
-            req.checkBody('password2','Die Passwörter müssen überein stimmen.').equals(req.body.password);
-
-            var errors = req.validationErrors();
-            if (errors) {
-                // Render the form using error information
-                res.render('reset.hbs',{errors: errors});
-            }
-            else {
-               // There are no errors so perform action with valid data (e.g. save record).
-                       
-            async.waterfall([
-              function(done) {
-                User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires:{ $gt: Date.now()}}, function(err, user) {
-                  if (!user) {
-                    req.flash('error', 'Der Link zum Zurücksetzen des Passworts ist ungültig.');
-                    return res.redirect('/login');
-                  }
-
-                  user.password = req.body.password;
-                  user.resetPasswordToken = undefined;
-                  user.resetPasswordExpires = undefined;
-          
-                  user.save(function(err) {
-                      done(err, user);                    
-                  });
-                });
-              },
-              function(user, done) {
-                var smtpTransport = nodemailer.createTransport({
-                    service: 'gmail',
-                    auth: {
-                        user: process.env.EMAIL_USER,
-                        pass: process.env.EMAIL_PASS
-                      },
-                      tls:{
-                        rejectUnauthorized:false
-                    }
-                  });
-                  var mailOptions = {
-                    to: user.email,
-                    from: 'snookertempel@gmail.com',
-                    subject: 'Dein Passwort wurde geändert',
-                    text: 'Hallo,\n\n' +
-                    'Das ist eine Bestätigung, dass das Passwort für dein Konto ' + user.email + ' geändert wurde.\n\n'+
-                    'Snookerclub Neubrandenburg'
-                    };
-                smtpTransport.sendMail(mailOptions, function(err) {
-                  req.flash('success_msg', 'Geschafft! Dein Passwort wurde geändert.');
-                  done(err);
-                });
-              }
-            ], function(err) {
-              res.redirect('/login');
-            });
+          ], function(err) {
+            if (err) return next(err);
+            res.redirect('/forgot');
+          });
         }
+    });
+
+
+    app.get('/reset/:token',(req,res)=>{
+        User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } },(er, user)=>{
+            if (!user) {
+                req.flash('error','Password Reset Link ist ungültig oder abgelaufen.');
+                return res.redirect('/forgot');
+            }
+
+            res.render('reset.hbs', {
+                title: 'Passwort vergessen',
+                user: req.user,
+                'info_msg':'Das Passwort muss mindestens eine Ziffer und einen Buchstaben enthalten und mindestens 6 Zeichen lang sein.'
+            });
+    });
+    });
+
+    app.post('/reset/:token', function(req, res) {
+        req.checkBody('password','Passwort darf nicht leer sein.').notEmpty();
+        req.checkBody('password','Das Passwort muss mindestens eine Ziffer und einen Buchstaben enthalten und mindestens 6 Zeichen lang sein.')
+        .matches(/^(?=.*\d)(?=.*[a-z])[0-9a-zA-Z]{6,}$/, "i");    
+        req.checkBody('password2','Die Passwörter müssen überein stimmen.').equals(req.body.password);
+
+        var errors = req.validationErrors();
+        if (errors) {
+            // Render the form using error information
+            res.render('reset.hbs',{errors: errors});
+        }
+        else {
+           // There are no errors so perform action with valid data (e.g. save record).
+                   
+        async.waterfall([
+          function(done) {
+            User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires:{ $gt: Date.now()}}, function(err, user) {
+              if (!user) {
+                req.flash('error', 'Der Link zum Zurücksetzen des Passworts ist ungültig.');
+                return res.redirect('/login');
+              }
+
+              user.password = req.body.password;
+              user.resetPasswordToken = undefined;
+              user.resetPasswordExpires = undefined;
+      
+              user.save(function(err) {
+                  done(err, user);                    
+              });
+            });
+          },
+          function(user, done) {
+            var smtpTransport = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: process.env.EMAIL_USER,
+                    pass: process.env.EMAIL_PASS
+                  },
+                  tls:{
+                    rejectUnauthorized:false
+                }
+              });
+              var mailOptions = {
+                to: user.email,
+                from: 'snookertempel@gmail.com',
+                subject: 'Dein Passwort wurde geändert',
+                text: 'Hallo,\n\n' +
+                'Das ist eine Bestätigung, dass das Passwort für dein Konto ' + user.email + ' geändert wurde.\n\n'+
+                'Snookerclub Neubrandenburg'
+                };
+            smtpTransport.sendMail(mailOptions, function(err) {
+              req.flash('success_msg', 'Geschafft! Dein Passwort wurde geändert.');
+              done(err);
+            });
+          }
+        ], function(err) {
+          res.redirect('/login');
         });
+    }
+    });
+
+
 
         // app.get('/users', (req,res) => {
         //     User.find().then((users) => {
@@ -296,7 +300,7 @@ app.get('/', (req, res) =>{
 
     // Mitgliederseiten
     app.get('/members',isLoggedIn, (req, res) =>{
-        
+
         res.render('members.hbs',{
             title: 'Mitglieder',
             user: req.user
@@ -379,6 +383,44 @@ app.get('/', (req, res) =>{
             console.log(e);
         });
     });
+
+    app.get('/breaks',isLoggedIn,(req, res)=>{
+        var userId = req.user._id;
+
+        Break.find({_member: userId}).sort({break: -1}).then((breaks)=>{
+            if (!breaks){
+                req.flash('info_msg','Von dir gibt es noch keine Breaks in der Datenbank.');
+                res.redirect('/members');
+            }
+            res.send(breaks);
+        }, (err)=>{
+            req.flash('error_msg','Es ist ein Fehler aufgetreten.');
+            res.redirect('/members');
+        });
+    });
+
+    app.get('/visitors',isLoggedIn,(req,res)=>{
+        var userId = req.user._id;
+        Rent.aggregate({$match:{_member: userId}},{$sort:{datum:-1}},{
+            $project:{
+                _id: false,
+                datum: true,
+                player1: true,
+                player2: true,
+                spielzeit:{$divide:[{$ceil:{$divide:[{$subtract: ["$ende","$start"]},360000]}},10]},
+                betrag:{$divide:[{$ceil:{$multiply:[{$divide:[{$subtract: ["$ende","$start"]},360000]},3.5]}},10]}
+            }
+        }).then((rents)=>{
+            if (!rents){
+                req.flash('info_msg','Du warst noch nicht mit Gastspielern spielen.');
+                res.redirect('/members');
+            }
+            res.send(rents);
+        },(err)=>{
+            req.flash('error_msg','Es ist ein Fehler aufgetreten.');
+            res.redirect('/members');
+        });
+    });
         
     app.get('/board', (req, res) =>{
         res.render('board.hbs',{
@@ -402,12 +444,9 @@ app.listen(app.get('port'), () => {
     console.log(`Server started on port ${app.get('port')}`);
 });
 
-module.exports = {app, passport, validator};
-
-function CheckLoginForm(req, res, next){
+function CheckLoginForm (req, res, next){
     req.checkBody('username','Der Benutzername darf nicht leer sein.').notEmpty();
     req.checkBody('password','Das Passwort darf nicht leer sein.').notEmpty();
-    
     
         var errors = req.validationErrors();
         if (errors) {
@@ -420,7 +459,7 @@ function CheckLoginForm(req, res, next){
         }
 }
 
-function CheckRegisterForm(req, res, next){
+function CheckRegisterForm (req, res, next){
     req.checkBody('username','Der Benutzername darf nicht leer sein.').notEmpty();
     req.checkBody('email','Bitte geben Sie eine Emailadresse an.').notEmpty();
     req.checkBody('password','Das Passwort darf nicht leer sein.').notEmpty();
@@ -439,6 +478,9 @@ function CheckRegisterForm(req, res, next){
             next();
         }
 }
+
+module.exports = {app, passport, validator};
+
 
 
 // User routes
