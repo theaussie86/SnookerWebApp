@@ -6,6 +6,9 @@
     {{> header}}
         <div id="members">
             <div class="row my-5">
+                <div class="col-md-2">
+                    {{> sidebar}}
+                </div>
                 <div class="col-md-10 p-1">
                     <div class="jumbotron" id="members-caption">
                         {{> alerts}}                        
@@ -68,46 +71,7 @@
                                     </div>
                                 </div>                                
                             </div>
-                            <div class="tab-pane fade" id="gastspieler" role="tabpanel" aria-labelledby="mitglieder-tab">
-                                <h6>Letzten Gastspieler</h6>
-                                <table class="table table-border">
-                                <thead>
-                                    <tr>
-                                    <th>Datum</th>
-                                    <th>Spieler 1</th>
-                                    <th>Spieler 2</th>
-                                    <th>Spielzeit</th>
-                                    <th>Rechnungsbetrag</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="myVisitors">
-                                </tbody>
-                                </table>
-                            </div>
-                            <div class="tab-pane fade" id="breaks" role="tabpanel" aria-labelledby="rechnung-tab">
-                                <div class="col-xs-5">
-                                    <h6>Meine Breaks</h6>
-                                    <table class="table table-border">
-                                    <thead>
-                                        <tr>
-                                        <th>Rang</th>
-                                        <th>Datum</th>
-                                        <th>Spieler</th>
-                                        <th>Break</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="myBreaks">
-                                    </tbody>
-                                    </table>
-                                </div>
-                            </div>                       
                         </div>
-                    </div>
-                </div>
-                <div class="col-md-2 p-1">
-                    <div class="btn-group-vertical d-block" role="group" aria-label="Button group with nested dropdown">
-                        <button type="button" class="btn btn-secondary">1</button>
-                        <button type="button" class="btn btn-secondary">2</button>                  
                     </div>
                 </div>
             </div>
@@ -117,11 +81,8 @@
 
         <!-- Optional JavaScript -->
 
-        <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-        <script type="text/javascript" src="js/jquery-3.2.1.min.js"></script>
-        <script type="text/javascript" src="js/popper.js"></script><!--<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>-->
-        <script type="text/javascript" src="js/bootstrap.min.js"></script>
-        <script type="text/javascript" src="js/moment.min.js"></script>
+        {{> scripts}}
+        <!-- Additional JavaScript -->
         <script type="text/javascript" src="js/members.js"></script>
     </body>
 </html>

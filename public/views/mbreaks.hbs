@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+
+<html >
+    {{> head}}
+    <body>
+    {{> header}}
+        <div id="members">
+            <div class="row my-5">
+                <div class="col-md-2">
+                    {{> sidebar}}
+                </div>
+                <div class="col-md-10 ">
+                    <div class="jumbotron" id="members-caption">
+                        {{> alerts}}                        
+                        {{!-- <div class="tab-content d-block" id="myTabContent"> --}}
+                            {{!-- <div class="tab-pane" id="breaks" role="tabpanel" aria-labelledby="rechnung-tab"> --}}
+                                <div class="container">
+                                    <p>
+                                        <h5>Meine Breaks</h5>
+                                    </p>
+                                    <table class="table table-border table-light">
+                                    <thead>
+                                        <tr>
+                                        <th>Rang</th>
+                                        <th>Datum</th>
+                                        <th>Spieler</th>
+                                        <th>Break</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="myBreaks">
+                                    </tbody>
+                                    </table>
+                                </div>
+                            {{!-- </div>                        --}}
+                        {{!-- </div> --}}
+                    </div>
+                </div>
+            </div>
+            {{> footer}}
+        </div>
+
+
+        <!-- Optional JavaScript -->
+        
+        {{> scripts}}
+        <!-- Additional JavaScript -->
+        <script type="text/javascript" src="js/breaks.js"></script>
+    </body>
+</html>

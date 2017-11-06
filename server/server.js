@@ -17,6 +17,7 @@ const nodemailer = require('nodemailer');
 const async = require('async');
 const crypto = require('crypto');
 const validator = require('express-validator');
+const moment = require('moment');
 
 const publicPath = path.join(__dirname,'../public');
 const {mongoose} = require('./db/mongoose');
@@ -86,8 +87,9 @@ hbs.registerHelper('getCurrentYear',() => {
     return new Date().getFullYear();
 });
 
-
-
+hbs.registerHelper('formatDate',(date)=>{
+    return moment(date).format('DD.MM.YYYY');
+})
 // Login, Logout, Register, Reset
 // Homepage
 app.get('/',(req,res)=>{
@@ -384,7 +386,14 @@ app.post('/login', CheckLoginForm, passport.authenticate('login',{
         });
     });
 
-    app.get('/breaks',isLoggedIn,(req, res)=>{
+    app.get('/breaks',isLoggedIn,(req,res)=>{
+        res.render('mbreaks.hbs',{
+            title:'Meine Breaks',
+            user: req.user
+        });
+    });
+
+    app.get('/breaks/get',isLoggedIn,(req, res)=>{
         var userId = req.user._id;
 
         Break.find({_member: userId}).sort({break: -1}).then((breaks)=>{
@@ -400,6 +409,13 @@ app.post('/login', CheckLoginForm, passport.authenticate('login',{
     });
 
     app.get('/visitors',isLoggedIn,(req,res)=>{
+        res.render('mvisitors.hbs',{
+            title: 'Meine Gastumsätze',
+            user: req.user
+        });
+    })
+
+    app.get('/visitors/get',isLoggedIn,(req,res)=>{
         var userId = req.user._id;
         Rent.aggregate({$match:{_member: userId}},{$sort:{datum:-1}},{
             $project:{

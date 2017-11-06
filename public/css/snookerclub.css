@@ -10,6 +10,10 @@ body{
     color: #6c6f73;
 }
 
+tbody{
+    text-align: left
+}
+
 h1,h2,h3,h4,h5{
     color: #333;
 }
@@ -70,8 +74,8 @@ img{
     background: #000000;
     /* background-size: cover;
     height: 100%;
-    width: 100%; */
-    align-items: center;
+    width: 100%; 
+    align-items: center;*/
 }
 
 #board-caption, #members-caption{

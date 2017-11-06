@@ -1,0 +1,23 @@
+{{#if user}}
+<div class="jumbotron">
+    <h5>Profil</h5>
+    <ul>
+        <li>Username: {{user.username}}</li>
+        {{#if user.isBoardMember}}
+        <li>Du bist im Vorstand</li>
+        {{/if}}
+        {{#each user.memberships}}
+            {{#if @first}}
+            <li>Du bist seit {{formatDate this.MembershipStart}} Mitglied im Verein</li>
+            {{/if}}
+            {{#if @last}}
+            <li>Du bist seit {{formatDate this.MembershipStart}} {{this.MembershipType}}</li>
+            {{/if}}
+        {{/each}}
+    </ul>
+</div>
+{{/if}}
+<div class="btn-group-vertical d-block" role="group" aria-label="Button group with nested dropdown">
+    <button type="button" class="btn btn-secondary">Abrechnung Gastspieler</button>
+    <button type="button" class="btn btn-secondary">Breaks eintragen</button>             
+</div>

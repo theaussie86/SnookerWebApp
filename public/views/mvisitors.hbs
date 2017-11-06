@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+
+<html >
+    {{> head}}
+    <body>
+    {{> header}}
+        <div id="members">
+            <div class="row my-5">
+                <div class="col-md-2">
+                    {{> sidebar}}
+                </div>
+                <div class="col-md-10 p-1">
+                    <div class="jumbotron" id="members-caption">
+                        {{> alerts}}                        
+                        {{!-- <div class="tab-content d-block" id="myTabContent"> --}}
+                            {{!-- <div class="tab-pane fade" id="gastspieler" role="tabpanel" aria-labelledby="mitglieder-tab"> --}}
+                                <p><h5>Meine Umsätze mit Gastspielern</h5></p>
+                                <table class="table table-border">
+                                <thead>
+                                    <tr>
+                                    <th>Datum</th>
+                                    <th>Spieler 1</th>
+                                    <th>Spieler 2</th>
+                                    <th>Spielzeit</th>
+                                    <th>Rechnungsbetrag</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="myVisitors">
+                                </tbody>
+                                </table>
+                            {{!-- </div>                       --}}
+                        {{!-- </div> --}}
+                    </div>
+                </div>
+            </div>
+            {{> footer}}
+        </div>
+
+
+        <!-- Optional JavaScript -->
+
+        {{> scripts}}
+        <!-- Additional JavaScript -->
+        <script type="text/javascript" src="js/visitors.js"></script>
+    </body>
+</html>
