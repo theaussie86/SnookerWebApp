@@ -10,13 +10,13 @@ const contactSchema = new mongoose.Schema({
 });
 
 const membershipSchema = new mongoose.Schema({
-    MembershipType : String,
-    MembershipFee: Number,
-    MembershipStart: {
+    membershipType : String,
+    membershipFee: Number,
+    membershipStart: {
         type : Date,
         default : Date.now
     },
-    MembershipEnd: Date
+    membershipEnd: Date
 });
 
 const UserSchema = new mongoose.Schema({
@@ -46,17 +46,7 @@ const UserSchema = new mongoose.Schema({
     },
     resetPasswordToken: String,
     resetPasswordExpires: Date,
-    tokens: [{
-        access: {
-            type: String,
-            required: true
-        },
-        token:{
-            type: String,
-            required: true
-        }
-    }],
-    Aktiv: {
+    aktiv: {
         type: Boolean,
         default: true
     },
@@ -96,27 +86,27 @@ UserSchema.methods.toJSON = function() {
     return _.pick(userObject,['_id','username','email']);
 };
 
-UserSchema.methods.generateAuthToken = function() {
-    var user = this;
-    var access = 'auth';
-    var token = jwt.sign({_id: user._id.toHexString(), access}, process.env.JWT_SECRET).toString();
+// UserSchema.methods.generateAuthToken = function() {
+//     var user = this;
+//     var access = 'auth';
+//     var token = jwt.sign({_id: user._id.toHexString(), access}, process.env.JWT_SECRET).toString();
 
-    user.tokens.push({access, token});
+//     user.tokens.push({access, token});
 
-    return user.save();//.then(() => {
-    //     return token;
-    // });
-};
+//     return user.save();//.then(() => {
+//     //     return token;
+//     // });
+// };
 
-UserSchema.methods.removeTokens = function(){
-    var user = this;
+// UserSchema.methods.removeTokens = function(){
+//     var user = this;
 
-    return user.update({
-        $pull: {
-            tokens: {}
-        }
-    });
-};
+//     return user.update({
+//         $pull: {
+//             tokens: {}
+//         }
+//     });
+// };
 
 UserSchema.statics.findByCredentials = function(username,password){
  var User= this;
@@ -138,22 +128,22 @@ UserSchema.statics.findByCredentials = function(username,password){
  });
 };
 
-UserSchema.statics.findByToken = function (token){
-    var User = this;
-    var decoded;
+// UserSchema.statics.findByToken = function (token){
+//     var User = this;
+//     var decoded;
 
-    try {
-        decoded=jwt.verify(token,process.env.JWT_SECRET);
-    } catch (err) {
-        return Promise.reject();
-    }
+//     try {
+//         decoded=jwt.verify(token,process.env.JWT_SECRET);
+//     } catch (err) {
+//         return Promise.reject();
+//     }
 
-    return User.findOne({
-        '_id': decoded._id,
-        'tokens.token': token,
-        'tokens.access':'auth'
-    });
-};
+//     return User.findOne({
+//         '_id': decoded._id,
+//         'tokens.token': token,
+//         'tokens.access':'auth'
+//     });
+// };
 
 UserSchema.pre('save', function(next){
     var user = this;

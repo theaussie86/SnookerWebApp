@@ -10,19 +10,24 @@ const breaks = db.tblBreaks;
 
 members.forEach(function(member) {
     // Mitgliedschaften und Beiträge
+    member.memberships =[];
     memberships.forEach(function(mship) {
+        var obj={};
         if (mship.mit_id_f === member.mit_id) {
-            member.mgl_anf = Date.parse(mship.mgl_anf);
-            member.mgl_end = Date.parse(mship.mgl_end)|| 0;
+            obj.mgl_anf = Date.parse(mship.mgl_anf);
+            obj.mgl_end = Date.parse(mship.mgl_end)|| 0;
             beitrag.forEach(function(beit) {
                 if (mship.bei_id_f === beit.bei_id) {
-                    member.Mitgliedschaft =beit.bei_art;
-                    member.Beitrag =beit.bei_wert;                    
+                    obj.Mitgliedschaft =beit.bei_art;
+                    obj.Beitrag =beit.bei_wert;                    
                 }
             }, this);
+            
+            member.memberships.push(obj);
+            
         }
 
-    });
+    },this);
     // Kontaktdaten
     kDaten.forEach(function(set) {
         if (set.mit_id_f === member.mit_id) {
@@ -35,7 +40,6 @@ members.forEach(function(member) {
             }
         }
     }, this);
-
 });
 
 module.exports = {members, tischmiete, breaks};

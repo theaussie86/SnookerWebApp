@@ -14,7 +14,11 @@ var Rent = mongoose.model('Rent',{
     player2: String,
     start: Date,
     ende: Date,
-    paid: Boolean
+    paid: Boolean,
+    onlyGuest:{
+        type: Boolean,
+        default: false
+    }
 });
 
 module.exports = {Rent};

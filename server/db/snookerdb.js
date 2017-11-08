@@ -543,7 +543,7 @@ var tblBeitrag = [
       "mit_id_f": "1",
       "bei_id_f": "1",
       "mgl_anf": "2015-01-01 00:00:00",
-      "mgl_end": "NULL"
+      "mgl_end": "2017-09-30 00:00:00"
     },
     {
       "mgl_id": "2",

@@ -9,11 +9,7 @@ var {members, tischmiete, breaks}= require('./snookerdata');
 module.exports.importSQLData=()=>{
 //Befüllen der users-Collection
 members.forEach(function(m) {
-    if (m.mgl_end !== 0) {
-        var active = false;
-    } else {
-        var active = true;        
-    }
+
     var user = new User({
         username: m.mit_spname,
         email: m.Email || `${m.mit_spname}@fake.com`,
@@ -23,23 +19,31 @@ members.forEach(function(m) {
         street: m.mit_str,
         zip: m.mit_plz,
         city: m.mit_ort,
-        Aktiv: active,
         mitID: m.mit_id
     });
+
+    m.memberships.forEach(function(mship){
+        user.memberships.push({
+            membershipType : mship.Mitgliedschaft,
+            membershipFee: mship.Beitrag,
+            membershipStart: mship.mgl_anf,
+            membershipEnd: mship.mgl_end
+        });
+    });
+
+    if (m.mit_spname==="Marian"||m.mit_spname==="Robert"||m.mit_spname==="Öschi"){
+        user.isBoardMember = true;
+    }
+
+    if (m.mit_spname==="Murat"||m.mit_spname==="Lego"){
+        user.aktiv = false;
+    }
+
     if (m.Handy) {
         user.contacts.push({
             contactType: 'Handy', contactValue: m.Handy
         });
     }
-
-    user.memberships.push({
-        MembershipType : m.Mitgliedschaft,
-        MembershipFee: m.Beitrag,
-        MembershipStart: m.mgl_anf,
-        MembershipEnd: m.mgl_end
-    });
-  
-
     
     user.save().then((doc) => {
         console.log(`${user.username} mit ID: ${user._id} abgespeichert.`);
