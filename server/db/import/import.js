@@ -23,6 +23,11 @@ members.forEach(function(m) {
     });
 
     m.memberships.forEach(function(mship){
+        if (mship.mgl_end !== 0){
+            user.aktiv = false
+        } else {
+            user.aktiv = true
+        }
         user.memberships.push({
             membershipType : mship.Mitgliedschaft,
             membershipFee: mship.Beitrag,
@@ -33,10 +38,6 @@ members.forEach(function(m) {
 
     if (m.mit_spname==="Marian"||m.mit_spname==="Robert"||m.mit_spname==="Öschi"){
         user.isBoardMember = true;
-    }
-
-    if (m.mit_spname==="Murat"||m.mit_spname==="Lego"){
-        user.aktiv = false;
     }
 
     if (m.Handy) {
@@ -62,6 +63,7 @@ tischmiete.forEach(function(r) {
         player2: r.tim_spieler2,
         start: new Date(r.tim_anf),
         ende: new Date(r.tim_end),
+        onlyGuests: r.onlyGuests,
         _member: new mongoose.Types.ObjectId()
     });
 

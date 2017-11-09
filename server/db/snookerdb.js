@@ -7116,7 +7116,7 @@ var tblBeitrag = [
       "tim_date": "2015-12-30 00:00:00",
       "tim_anf": "1899-12-30 14:15:00",
       "tim_end": "1899-12-30 16:15:00",
-      "tim_spieler1": "Gerd",
+      "tim_spieler1": "Meinhard",
       "tim_spieler2": "Stefan"
     },
     {

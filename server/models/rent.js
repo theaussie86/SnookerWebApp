@@ -15,7 +15,7 @@ var Rent = mongoose.model('Rent',{
     start: Date,
     ende: Date,
     paid: Boolean,
-    onlyGuest:{
+    onlyGuests:{
         type: Boolean,
         default: false
     }

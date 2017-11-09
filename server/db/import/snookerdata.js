@@ -14,8 +14,8 @@ members.forEach(function(member) {
     memberships.forEach(function(mship) {
         var obj={};
         if (mship.mit_id_f === member.mit_id) {
-            obj.mgl_anf = Date.parse(mship.mgl_anf);
-            obj.mgl_end = Date.parse(mship.mgl_end)|| 0;
+            obj.mgl_anf = Date.parse(mship.mgl_anf)+43200000;
+            obj.mgl_end = Date.parse(mship.mgl_end)+43200000|| 0;
             beitrag.forEach(function(beit) {
                 if (mship.bei_id_f === beit.bei_id) {
                     obj.Mitgliedschaft =beit.bei_art;
@@ -41,6 +41,26 @@ members.forEach(function(member) {
         }
     }, this);
 });
+
+breaks.forEach((b) => {
+    b.brk_date=Date.parse(b.brk_date)+43200000;
+});
+
+tischmiete.forEach((t) => {
+    var name = "";
+    t.tim_date=Date.parse(t.tim_date)+43200000;
+    members.forEach((m) => {
+        if (m.mit_id === t.mit_id_f){
+            return name = m.mit_spname;
+        }
+    });
+    if (t.tim_spieler1=== name || t.tim_spieler2===name){
+        t.onlyGuests = false;
+    } else {
+        t.onlyGuests = true;
+    }
+});
+
 
 module.exports = {members, tischmiete, breaks};
 

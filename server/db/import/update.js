@@ -25,3 +25,11 @@ module.exports.updateOldIds = () => {
     Break.update({},{$unset:{mitID:''}},{multi: true}).exec(); 
     console.log('Alle alten IDs wurden gelöscht');
 };
+
+module.exports.fillBills=()=>{
+    Rent.find({}, (err, rents)=>{
+        if (err) throw err;
+    }).cursor().on('data',(rent)=>{
+        
+    })
+}

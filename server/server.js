@@ -116,11 +116,11 @@ app.post('/login', CheckLoginForm, passport.authenticate('login',{
 
 // Logout
     app.get('/logout', isLoggedIn, (req, res)=>{
-        req.user.removeTokens().then(()=>{
-            req.logout()
-            req.flash('success_msg','Sie haben sich erfolgreich ausgeloggt.');
-            res.redirect('/');
-        });
+
+        req.logout()
+        req.flash('success_msg','Sie haben sich erfolgreich ausgeloggt.');
+        res.redirect('/');
+
     });
 
 // Register

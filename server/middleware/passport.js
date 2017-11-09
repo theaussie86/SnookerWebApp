@@ -26,12 +26,8 @@ module.exports = function(passport){
                 if (err) return done(err);
                 if (!user) return done(null, false, req.flash('error_msg','Benutzer nicht gefunden'));
                 if (!bcrypt.compareSync(password, user.password)) return done(null, false, req.flash('error_msg', 'Password ist falsch. Versuchen Sie es erneut.'));
-                if (!user.Aktiv) return done(null, false, req.flash('error_msg', 'Sie sind kein aktives Mitglied mehr. Melden Sie sich wieder an.'));
-                if (user.tokens.length > 0) {
-                    User.find({username: user.username}).remove({'access':'auth'}).exec();
-                }
-                
-                user.generateAuthToken();
+                if (!user.aktiv) return done(null, false, req.flash('error_msg', 'Sie sind kein aktives Mitglied mehr. Melden Sie sich wieder an.'));
+
                 return done(null, user);
             });
         });
