@@ -1,7 +1,7 @@
 const express = require('express');
 
 const {importSQLData} = require('./../db/import/import');
-const {updateBreaksAndRents,updateOldIds}=require('./../db/import/update');
+const {updateBreaksAndRents,updateOldIds,fillBills}=require('./../db/import/update');
 const {User} = require('./../models/user');
 const {Break} = require('./../models/break');
 const {Rent} = require('./../models/rent');
@@ -49,15 +49,39 @@ importRouter.get('/update',(req,res)=>{
                 console.log('Hier stimmt was nicht');
                 throw new Error('Hier stimmt was nicht');
                 req.flash('error_msg','Hier stimmt was nicht')
-                res.redirect('/');
-                
+                res.redirect('/');                
             }
-        
+            fillBills();
         }).catch((e)=>{
             console.log(e);
             req.flash('error_msg',e)
             res.redirect('/');
         });
+});
+
+importRouter.get('/test',(req,res)=>{
+    Rent.aggregate([{$group: {
+        _id:{ Mitglied: "$_member", Monat: { $month: "$datum"}, Jahr: { $year: "$datum" } },
+        Umsätze:{ $push:{Datum: "$datum", Spieler1: "$player1", Spieler2: "$player2", nurGäste: "$onlyGuests"}}
+    }},{
+        $lookup:{
+            from: "users",
+            localField: "_id.Mitglied",
+            foreignField: "_id",
+            as: "MitgliedDetails"
+        }
+    },{
+        $project:{
+            "MitgliedDetails.username":1,
+            "_id.Monat":1,
+            "_id.Jahr":1,
+            "Umsätze": 1
+        }
+    }]).then((bills)=>{
+        res.send(bills);
+    },(err)=>{
+        res.send (err);
+    });
 });
 
 module.exports = {importRouter};

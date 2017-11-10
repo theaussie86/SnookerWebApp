@@ -30,6 +30,19 @@ module.exports.fillBills=()=>{
     Rent.find({}, (err, rents)=>{
         if (err) throw err;
     }).cursor().on('data',(rent)=>{
-        
-    })
+        var monat = rent.datum.getMonth();
+        var jahr = rent.datum.getYear();
+        User.findOne({
+            _id: rent._member,
+            'bills.month': monat,
+            'bills.year': jahr
+        }).then((user)=>{
+            if (!user) {
+                return console.log('Kein User gefunden.');
+            }
+            return console.log(user);
+        }).catch((e)=>{
+            return console.log(e);
+        });
+    });
 }
