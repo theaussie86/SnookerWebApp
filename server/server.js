@@ -437,6 +437,93 @@ app.post('/login', CheckLoginForm, passport.authenticate('login',{
             res.redirect('/members');
         });
     });
+
+    app.get('/bills',isLoggedIn,(req,res)=>{
+        res.render('mbills.hbs',{
+            title: 'Meine Rechnungen',
+            user: req.user
+        });
+    });
+
+    app.get('/bills/get',isLoggedIn,(req, res)=>{
+        var userId = req.user._id;
+        Rent.aggregate({$match:{_member: userId}},{
+            $group:{
+                _id: {monat:{$month: "$datum"},jahr:{$year: "$datum"},member: "$_member"},
+                Anzahl: {$sum:1},
+                Gastumsatz:{$sum:{$divide:[{$ceil:{$multiply:[{$divide:[{$subtract: ["$ende","$start"]},360000]},3.5]}},10]}},
+                Umsätze:{$push: "$$ROOT"}
+            }
+        },{
+            $lookup:{
+                from: "users",
+                localField: "_id.member",
+                foreignField: "_id",
+                as: "User"
+            }
+        },{
+            $unwind:"$User"
+        },{
+            $project:{
+                _id: true,
+                Anzahl: true,
+                Gastumsatz: true,
+                Umsätze: true,
+                User: true,
+                Datum: {$arrayElemAt:["$Umsätze.datum",0]}
+            }
+        },{
+            $project:{
+                _id: true,
+                Anzahl: true,
+                Gastumsatz: true,
+                Umsätze: true,
+                Datum: true,
+                membership: {
+                    $map:{
+                        input:"$User.memberships",
+                        as: "mem",
+                        in:{$cond:[
+                            {$and:[
+                                {$gte:["$Datum","$$mem.membershipStart"]},
+                                {$or:[{$eq:["$$mem.membershipEnd",new Date(0)]},{$lte:["$Datum","$$mem.membershipEnd"]}]}
+                            ]},
+                            "$$mem.membershipFee",
+                            false
+                        ]}
+                    }
+                }
+            }
+        },{
+            $project:{
+                _id: true,
+                // Anzahl: true,
+                Datum: true,
+                Gastumsatz: true,
+                Umsätze: true,               
+                Beitrag:{
+                    $filter:{
+                        input: "$membership",
+                        as: "mem",
+                        cond:{$ne: ["$$mem",false]}
+                    }
+                }
+            }
+        },{$unwind: "$Beitrag"}).then((bills)=>{
+            if (!bills){
+                console.log('keine Rechnungen gefunden.')
+                res.status(404).send();
+                // req.flash('info_msg','Du hast noch keine Rechnungen.');
+                // res.redirect('/members');
+            }
+            res.send(bills);
+        },(err)=>{
+            res.status(400).send();
+            console.log(err);
+            // req.flash('error_msg','Es ist ein Fehler aufgetreten.');
+            // res.redirect('/members');
+        });
+    })
         
     app.get('/board', (req, res) =>{
         res.render('board.hbs',{

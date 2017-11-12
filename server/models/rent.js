@@ -3,7 +3,8 @@ const mongoose = require('mongoose');
 var Rent = mongoose.model('Rent',{
     _member: {
         type: mongoose.Schema.Types.ObjectId,
-        required:true
+        required:true,
+        ref: "User"
     },
     mitID: Number,
     datum: Date,
