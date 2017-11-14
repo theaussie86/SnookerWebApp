@@ -1,19 +1,11 @@
 {{#if user}}
 <div class="jumbotron">
     <h5>Profil</h5>
-    <ul>
+    <ul class="list-unstyled">
         <li>Username: {{user.username}}</li>
         {{#if user.isBoardMember}}
         <li>Du bist im Vorstand</li>
         {{/if}}
-        {{#each user.memberships}}
-            {{#if @first}}
-            <li>Du bist seit {{formatDate this.MembershipStart}} Mitglied im Verein</li>
-            {{/if}}
-            {{#if @last}}
-            <li>Du bist seit {{formatDate this.MembershipStart}} {{this.MembershipType}}</li>
-            {{/if}}
-        {{/each}}
     </ul>
 </div>
 {{/if}}

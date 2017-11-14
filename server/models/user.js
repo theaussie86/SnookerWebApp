@@ -22,9 +22,9 @@ const membershipSchema = new mongoose.Schema({
 const billSchema = new mongoose.Schema({
     billDate : Date,
     membershipFee: Number,
-    feePaid: Boolean,
+    feePaid: {type:Boolean,default: false},
     visitorsSales: Number,
-    salesPaid: Boolean,
+    salesPaid: {type:Boolean,default: false},
     billRents:[{
         type: mongoose.Schema.Types.ObjectId,
         ref: "rents"

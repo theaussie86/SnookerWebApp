@@ -365,12 +365,15 @@ app.post('/login', CheckLoginForm, passport.authenticate('login',{
                 datum: true,
                 year:{$year:"$datum"},
                 month:{$month: "$datum"},
-                betrag:{$divide:[{$ceil:{$multiply:[{$divide:[{$subtract: ["$ende","$start"]},360000]},3.5]}},10]}                
+                betrag:{
+                    $multiply:[{$divide:[{$ceil:{$multiply:[{$divide:[{$subtract: ["$ende","$start"]},360000]},3.5]}},10]},
+                    {$cond:[{$eq:["$onlyGuests", true]},2,1]}]
+                }                
             }
         },{
             $match:{
-                year: new Date(2016,5,13).getFullYear(),
-                $or:[{month:new Date(2016,5,13).getMonth()},{month:new Date(2016,5,13).getMonth()-1}]                
+                year: new Date().getFullYear(),
+                $or:[{month:new Date().getMonth()},{month:new Date().getMonth()-1}]                
             }
         },{
             $group:{
@@ -425,7 +428,10 @@ app.post('/login', CheckLoginForm, passport.authenticate('login',{
                 player1: true,
                 player2: true,
                 spielzeit:{$divide:[{$ceil:{$divide:[{$subtract: ["$ende","$start"]},360000]}},10]},
-                betrag:{$divide:[{$ceil:{$multiply:[{$divide:[{$subtract: ["$ende","$start"]},360000]},3.5]}},10]}
+                betrag:{
+                    $multiply:[{$divide:[{$ceil:{$multiply:[{$divide:[{$subtract: ["$ende","$start"]},360000]},3.5]}},10]},
+                    {$cond:[{$eq:["$onlyGuests", true]},2,1]}]
+                } 
             }
         }).then((rents)=>{
             if (!rents){
@@ -439,95 +445,34 @@ app.post('/login', CheckLoginForm, passport.authenticate('login',{
         });
     });
 
-    app.get('/bills',/*isLoggedIn,*/(req,res)=>{
-        fillBills();
+    app.get('/bills',isLoggedIn,(req,res)=>{
         res.render('mbills.hbs',{
             title: 'Meine Rechnungen',
-            // user: req.user
+            user: req.user
         });
     });
 
-    app.get('/bills/get',isLoggedIn,(req, res)=>{
-        var userId = req.user._id;
-        Rent.aggregate({
-            $match:{$and:[{_member: userId},{}]}
-        },{
-            $group:{
-                _id: {monat:{$month: "$datum"},jahr:{$year: "$datum"},member: "$_member"},
-                Anzahl: {$sum:1},
-                Gastumsatz:{$sum:{$divide:[{$ceil:{$multiply:[{$divide:[{$subtract: ["$ende","$start"]},360000]},3.5]}},10]}},
-                Umsätze:{$push: "$$ROOT"}
+    app.get('/bills/get',isLoggedIn,async (req, res)=>{
+        const bills = req.user.bills;
+
+        bills.sort(function (a, b) {
+            if (a.billDate > b.billDate) {
+              return -1;
             }
-        },{
-            $lookup:{
-                from: "users",
-                localField: "_id.member",
-                foreignField: "_id",
-                as: "User"
+            if (a.billDate < b.billDate) {
+              return 1;
             }
-        },{
-            $unwind:"$User"
-        },{
-            $project:{
-                _id: true,
-                Anzahl: true,
-                Gastumsatz: true,
-                Umsätze: true,
-                User: true,
-                Datum: {$arrayElemAt:["$Umsätze.datum",0]}
-            }
-        },{
-            $project:{
-                _id: true,
-                Anzahl: true,
-                Gastumsatz: true,
-                Umsätze: true,
-                Datum: true,
-                membership: {
-                    $map:{
-                        input:"$User.memberships",
-                        as: "mem",
-                        in:{$cond:[
-                            {$and:[
-                                {$gte:["$Datum","$$mem.membershipStart"]},
-                                {$or:[{$eq:["$$mem.membershipEnd",new Date(0)]},{$lte:["$Datum","$$mem.membershipEnd"]}]}
-                            ]},
-                            "$$mem.membershipFee",
-                            false
-                        ]}
-                    }
-                }
-            }
-        },{
-            $project:{
-                _id: true,
-                // Anzahl: true,
-                Datum: true,
-                Gastumsatz: true,
-                Umsätze: true,               
-                Beitrag:{
-                    $filter:{
-                        input: "$membership",
-                        as: "mem",
-                        cond:{$ne: ["$$mem",false]}
-                    }
-                }
-            }
-        },{$unwind: "$Beitrag"}).then((bills)=>{
+            return 0;
+        });
+
             if (!bills){
                 console.log('keine Rechnungen gefunden.')
-                res.status(404).send();
-                // req.flash('info_msg','Du hast noch keine Rechnungen.');
-                // res.redirect('/members');
+                res.status(404).send({
+                    "info_msg":"Du hast noch keine Rechnungen."
+                });
             }
             res.send(bills);
-        },(err)=>{
-            res.status(400).send();
-            console.log(err);
-            // req.flash('error_msg','Es ist ein Fehler aufgetreten.');
-            // res.redirect('/members');
-        });
-    })
+    });
         
     app.get('/board', (req, res) =>{
         res.render('board.hbs',{
