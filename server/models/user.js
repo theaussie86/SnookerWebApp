@@ -19,6 +19,18 @@ const membershipSchema = new mongoose.Schema({
     membershipEnd: Date
 });
 
+const billSchema = new mongoose.Schema({
+    billDate : Date,
+    membershipFee: Number,
+    feePaid: Boolean,
+    visitorsSales: Number,
+    salesPaid: Boolean,
+    billRents:[{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "rents"
+    }]
+});
+
 const UserSchema = new mongoose.Schema({
     email: {
         type: String,
@@ -76,6 +88,7 @@ const UserSchema = new mongoose.Schema({
     },
     contacts: [contactSchema],
     memberships:[membershipSchema],
+    bills:[billSchema],
     mitID: Number
 });
 

@@ -27,22 +27,23 @@ module.exports.updateOldIds = () => {
 };
 
 module.exports.fillBills=()=>{
-    Rent.find({}, (err, rents)=>{
+    User.find({}, (err, users)=>{
         if (err) throw err;
-    }).cursor().on('data',(rent)=>{
-        var monat = rent.datum.getMonth();
-        var jahr = rent.datum.getYear();
-        User.findOne({
-            _id: rent._member,
-            'bills.month': monat,
-            'bills.year': jahr
-        }).then((user)=>{
-            if (!user) {
-                return console.log('Kein User gefunden.');
-            }
-            return console.log(user);
-        }).catch((e)=>{
-            return console.log(e);
+    }).cursor().on('data',(user)=>{
+        var userId = user._id;
+        user.memberships.forEach((element) => {
+            var start = element.membershipStart;
+            var ende = element.membershipEnd;
+            // while (start<=ende) {
+                Rent.find({
+                    _member: userId,
+                    datum:{$gte: start/*, $lte: start.setMonth(start.getMonth()+1)*/}
+                }).then((rents)=>{
+                    console.log(rents);
+                }).catch((e)=>console.log(e));
+            // }
         });
+    }).on('end',()=>{
+        console.log('Alle Rechnungen erstellt.');
     });
 }

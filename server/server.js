@@ -26,6 +26,7 @@ const {Break} = require('./models/break');
 const {Rent} = require('./models/rent');
 const {importRouter} = require('./routes/import');
 const {isLoggedIn, isAdmin} = require('./middleware/authenticate');
+const {fillBills} = require('./db/import/update');
 
 var app = express();
 
@@ -438,16 +439,19 @@ app.post('/login', CheckLoginForm, passport.authenticate('login',{
         });
     });
 
-    app.get('/bills',isLoggedIn,(req,res)=>{
+    app.get('/bills',/*isLoggedIn,*/(req,res)=>{
+        fillBills();
         res.render('mbills.hbs',{
             title: 'Meine Rechnungen',
-            user: req.user
+            // user: req.user
         });
     });
 
     app.get('/bills/get',isLoggedIn,(req, res)=>{
         var userId = req.user._id;
-        Rent.aggregate({$match:{_member: userId}},{
+        Rent.aggregate({
+            $match:{$and:[{_member: userId},{}]}
+        },{
             $group:{
                 _id: {monat:{$month: "$datum"},jahr:{$year: "$datum"},member: "$_member"},
                 Anzahl: {$sum:1},
