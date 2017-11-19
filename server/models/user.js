@@ -27,7 +27,7 @@ const billSchema = new mongoose.Schema({
     salesPaid: {type:Boolean,default: false},
     billRents:[{
         type: mongoose.Schema.Types.ObjectId,
-        ref: "rents"
+        ref: 'Rent'
     }]
 });
 
@@ -92,12 +92,12 @@ const UserSchema = new mongoose.Schema({
     mitID: Number
 });
 
-UserSchema.methods.toJSON = function() {
-    var user = this;
-    var userObject = user.toObject();
+// UserSchema.methods.toJSON = function() {
+//     var user = this;
+//     var userObject = user.toObject();
 
-    return _.pick(userObject,['_id','username','email']);
-};
+//     return _.pick(userObject,['_id','username','email']);
+// };
 
 // UserSchema.methods.generateAuthToken = function() {
 //     var user = this;

@@ -473,6 +473,21 @@ app.post('/login', CheckLoginForm, passport.authenticate('login',{
             }
             res.send(bills);
     });
+
+    app.get('/bills/single/:time',isLoggedIn,(req,res)=>{
+        const id = req.user._id;
+        var datum =new Date(Number(req.params.time));
+        var start = new Date(datum.getFullYear(),datum.getMonth()-1,datum.getDate(),12);
+        var end = new Date(datum.getFullYear(),datum.getMonth(),0,12);
+        Rent.find({
+            _member: id,
+            datum:{$gte: start,$lte: end}
+        }).then((rents)=>{
+            res.send(rents);
+        }).catch((e)=>{
+            res.send(e);
+        });
+    });
         
     app.get('/board', (req, res) =>{
         res.render('board.hbs',{

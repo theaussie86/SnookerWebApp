@@ -114,7 +114,7 @@ importRouter.get('/bills',(req,res)=>{
                         } else {
                             guests = 1;
                         }
-                        return sum + (Math.ceil(guests*3.5*(rent.ende-rent.start)/360000)/10);
+                        return sum + (Math.ceil(3.5*(rent.ende-rent.start)/360000)*guests/10);
                     },0);
                         // console.log(`+++++++++++START: ${start}+++++++++++++`);
                         // console.log(`User: ${user.username}, Ende: ${ende}`);
