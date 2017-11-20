@@ -1,6 +1,21 @@
 {{#if user}}
 <div class="jumbotron">
+
     <h5>Profil</h5>
+    {{#if user.image}}
+    {{else}}
+    <div class="image-upload">
+    <label for="file-input">
+        <img src="/img/placeholder.png"/>
+    </label>
+
+    {{!-- <input type="file" name="img" id="file-input" accept=".png,.jpg,.jpeg,.gif,.tif" /> --}}
+    </div>
+    {{!-- <form action="" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" enctype="multipart/form-data"></input>
+    </form> --}}
+    {{!-- <img src="/img/ntcmUnterschrift.jpg"> --}}
+    {{/if}}
     <ul class="list-unstyled">
         <li id="username">Username: {{user.username}}</li>
         {{#if user.isBoardMember}}

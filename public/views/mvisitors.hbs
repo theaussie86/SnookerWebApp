@@ -4,6 +4,7 @@
     {{> head}}
     <body>
     {{> header}}
+
         <div id="members">
             <div class="row my-5">
                 <div class="col-md-2">
@@ -11,25 +12,45 @@
                 </div>
                 <div class="col-md-10 p-1">
                     <div class="jumbotron" id="members-caption">
+                        <div class="row">
+                            <div class="col-4">
+                            <select id="month" class="custom-select d-block my-3">
+                                <option value="0">Monat auswählen</option>
+                                <option value="1">Januar</option>
+                                <option value="2">Februar</option>
+                                <option value="3">März</option>
+                                <option value="4">April</option>
+                                <option value="5">Mai</option>
+                                <option value="6">Juni</option>
+                                <option value="7">Juli</option>
+                                <option value="8">August</option>
+                                <option value="9">September</option>
+                                <option value="10">Oktober</option>
+                                <option value="11">November</option>
+                                <option value="12">Dezember</option>
+                            </select>
+                            </div>
+                            <div class="col-4">
+                            <select id="year" class="custom-select d-block my-3">
+                                <option value="0">Jahr auswählen</option>
+                            </select>
+                            </div>
+                            <div class="col-2"><p class="align-bottom">Summe der Umsätze: <br><strong id="Umsatzsumme"></strong></p></div>
+                        </div>
                         {{> alerts}}                        
-                        {{!-- <div class="tab-content d-block" id="myTabContent"> --}}
-                            {{!-- <div class="tab-pane fade" id="gastspieler" role="tabpanel" aria-labelledby="mitglieder-tab"> --}}
-                                <p><h5>Meine Umsätze mit Gastspielern</h5></p>
-                                <table class="table table-border">
-                                <thead>
-                                    <tr>
-                                    <th>Datum</th>
-                                    <th>Spieler 1</th>
-                                    <th>Spieler 2</th>
-                                    <th>Spielzeit</th>
-                                    <th>Rechnungsbetrag</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="myVisitors">
-                                </tbody>
-                                </table>
-                            {{!-- </div>                       --}}
-                        {{!-- </div> --}}
+                        <p><h5>Meine Umsätze mit Gastspielern</h5></p>
+                        <table class="table table-border">
+                        <thead>
+                            <tr>
+                            <th>Datum</th>
+                            <th>Spieler</th>
+                            <th>Spielzeit</th>
+                            <th>Rechnungsbetrag</th>
+                            </tr>
+                        </thead>
+                        <tbody id="myVisitors">
+                        </tbody>
+                        </table>
                     </div>
                 </div>
             </div>

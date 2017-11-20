@@ -419,14 +419,34 @@ app.post('/login', CheckLoginForm, passport.authenticate('login',{
         });
     })
 
-    app.get('/visitors/get',isLoggedIn,(req,res)=>{
+    app.get('/visitors/get/:monat/:jahr',isLoggedIn,(req,res)=>{
         var userId = req.user._id;
-        Rent.aggregate({$match:{_member: userId}},{$sort:{datum:-1}},{
+        var start;
+        var end;
+        if (req.params.monat!=0 && req.params.jahr!=0){
+            start= new Date(req.params.jahr,req.params.monat-1,1);
+            end= new Date(req.params.jahr,req.params.monat,0);
+        } else if(req.params.monat != 0 && req.params.jahr==0){
+            start= new Date(new Date().getFullYear(),req.params.monat-1,1);
+            end= new Date(new Date().getFullYear(),req.params.monat,0);
+        } else if(req.params.monat == 0 && req.params.jahr!=0){
+            start= new Date(req.params.jahr,0,1);
+            end= new Date(req.params.jahr,11,31);
+        } else {
+            start= new Date(2015,0,1);
+            end= new Date();
+        }
+        
+        Rent.aggregate({$match:{
+            _member: userId,
+            datum:{$gte: start, $lte: end}
+        }},{$sort:{datum:-1}},{
             $project:{
                 _id: false,
                 datum: true,
                 player1: true,
                 player2: true,
+                onlyGuests:true,
                 spielzeit:{$divide:[{$ceil:{$divide:[{$subtract: ["$ende","$start"]},360000]}},10]},
                 betrag:{
                     $multiply:[{$divide:[{$ceil:{$multiply:[{$divide:[{$subtract: ["$ende","$start"]},360000]},3.5]}},10]},
@@ -486,6 +506,13 @@ app.post('/login', CheckLoginForm, passport.authenticate('login',{
             res.send(rents);
         }).catch((e)=>{
             res.send(e);
+        });
+    });
+
+    app.get('/profile',isLoggedIn,(req,res)=>{
+        res.render('mprofil.hbs',{
+            title: 'Mein  Profil',
+            user: req.user
         });
     });
         

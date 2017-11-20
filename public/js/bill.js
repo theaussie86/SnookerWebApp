@@ -1,9 +1,11 @@
 $(function(){
+
     $.ajax({
         type: 'GET',
         url: '/bills/get',
         success: function(bills){
             $.each(bills,function(i,bill){
+                moment.locale('de');
                 var monyear = moment(bill.billDate).format('MMM YYYY');
                 var salesClass = '';
                 var feeClass = '';
