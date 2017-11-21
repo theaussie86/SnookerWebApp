@@ -521,15 +521,12 @@ app.post('/login', CheckLoginForm, passport.authenticate('login',{
     });
 
     app.post('/enterbreak',isLoggedIn,(req,res)=>{
-        let newBreak = new Break({
-            datum: req.body.datum,
-            break: req.body.break,
-        });
-        if (!req.body.spieler){
+        var body = _.pick(req.body,['datum','player','break']);
+        console.log(body);
+        let newBreak = new Break(body);
+        if (!req.body.player){
             newBreak.player = req.user.username;
             newBreak._member = req.user._id;
-        } else{
-            newBreak.player = req.body.spieler;
         }
         newBreak.save().then((doc)=>{
             req.flash('success_msg',`Das Break mit ${doc.break} Punkten von ${doc.player} ist gespeichert.`);
@@ -546,6 +543,30 @@ app.post('/login', CheckLoginForm, passport.authenticate('login',{
             title: 'Gäste abrechnen',
             user: req.user
         });
+    });
+
+    app.post('/entervisitor',isLoggedIn,(req,res)=>{
+        var body = _.pick(req.body,['datum','player1','player2','start','ende']);
+        body.start = moment(body.start,'hh:mm');
+        body.ende = moment(body.ende,'hh:mm');
+        if(body.start>body.ende){
+            body.ende.add(1,'d');
+        }
+        var newRent = new Rent(body);
+        if (!req.body.player1){
+            newRent.player1=req.user.username;
+        } else {
+            newRent.onlyGuests = true;
+        }
+        newRent._member=req.user._id;
+        newRent.save().then((doc)=>{
+            req.flash('success_msg',`Gespeichert bei ${req.user.username}.`);
+            res.redirect('/entervisitor');
+        },(e)=>{
+            req.flash('error_msg',`Beim Abspeichern gab es ein Problem. ${e}. Versuchen Sie es erneut.`);
+            res.redirect('/entervisitor');
+        });
+
     });
 
     app.get('/profile',isLoggedIn,(req,res)=>{
