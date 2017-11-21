@@ -41,9 +41,7 @@ members.forEach(function(m) {
     }
 
     if (m.Handy) {
-        user.contacts.push({
-            contactType: 'Handy', contactValue: m.Handy
-        });
+        user.handy= m.Handy;
     }
     
     user.save().then((doc) => {

@@ -91,6 +91,10 @@ hbs.registerHelper('getCurrentYear',() => {
 hbs.registerHelper('formatDate',(date)=>{
     return moment(date).format('DD.MM.YYYY');
 })
+
+hbs.registerHelper('formatCurrency',(num)=>{
+    return num.toFixed(2).replace('.',',')+' €';
+})
 // Login, Logout, Register, Reset
 // Homepage
 app.get('/',(req,res)=>{
@@ -506,6 +510,41 @@ app.post('/login', CheckLoginForm, passport.authenticate('login',{
             res.send(rents);
         }).catch((e)=>{
             res.send(e);
+        });
+    });
+
+    app.get('/enterbreak',isLoggedIn,(req,res)=>{
+        res.render('enterbreaks.hbs',{
+            title: 'Breaks eingeben',
+            user: req.user
+        });
+    });
+
+    app.post('/enterbreak',isLoggedIn,(req,res)=>{
+        let newBreak = new Break({
+            datum: req.body.datum,
+            break: req.body.break,
+        });
+        if (!req.body.spieler){
+            newBreak.player = req.user.username;
+            newBreak._member = req.user._id;
+        } else{
+            newBreak.player = req.body.spieler;
+        }
+        newBreak.save().then((doc)=>{
+            req.flash('success_msg',`Das Break mit ${doc.break} Punkten von ${doc.player} ist gespeichert.`);
+            res.redirect('/enterbreak');
+        },(e)=>{
+            req.flash('error_msg',`Beim Abspeichern gab es ein Problem.<br>${e}<br>Versuchen Sie es erneut.`);
+            res.redirect('/enterbreak');
+        });
+
+    });
+
+    app.get('/entervisitor',isLoggedIn,(req,res)=>{
+        res.render('entervisitors.hbs',{
+            title: 'Gäste abrechnen',
+            user: req.user
         });
     });
 

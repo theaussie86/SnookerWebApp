@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+
+<html >
+    {{> head}}
+    <body>
+    {{> header}}
+
+    <div id="stage">
+        <div class="container-fluid" id="stage-caption">
+            <div id="formContainer" class="container-fluid p-2 rounded col-10 col-md-6">
+                <form id="breakform" method="POST" action="/enterbreak"> 
+                    <div class="form-group">
+                        <h4>Break eintragen</h4>
+                        <hr>
+                        {{> alerts}}
+                        <label for="datum" class="form-control-label float-left text-secondary">Datum:</label>
+                        <input type="date" value="today" class="form-control" name="datum" id="datum" required autofocus></input>
+                        <label for="spieler" class="form-control-label float-left text-secondary">Spielername:</label>
+                        <input type="text" class="form-control" name="spieler" id="spieler" placeholder="{{user.username}}" required readonly>
+                        <div class="form-row">
+                            <div class="form-check">
+                            <label for="member" class="form-check-label float-left text-secondary">
+                                <input type="checkbox" class="form-check-input" value="noMember" name="member" id="member">
+                                Ich habe das Break nicht gespielt!
+                            </label>
+                            </div>
+                        </div>
+                        <label for="break" class="form-control-label float-left text-secondary">Höhe des Breaks:</label>
+                        <input type="number" class="form-control" name="break" min="1" max="155" id="break" placeholder="Wie hoch war das Break?" required>
+                        <hr>
+                        <button type="submit" class="btn btn-success">Speichern</button>
+                    </div>
+                </form> 
+            </div>
+        </div>
+    </div>
+
+    {{> footer}}
+    {{> scripts}}
+        <!-- Optional JavaScript -->
+        <script type="text/javascript" src="js/enterbreaks.js"></script>
+    </body>
+</html>

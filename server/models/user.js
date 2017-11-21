@@ -4,11 +4,6 @@ const jwt = require('jsonwebtoken');
 const _ = require('lodash');
 const bcrypt = require('bcryptjs');
 
-const contactSchema = new mongoose.Schema({
-    contactType: String,
-    contactValue: String
-});
-
 const membershipSchema = new mongoose.Schema({
     membershipType : String,
     membershipFee: Number,
@@ -24,11 +19,7 @@ const billSchema = new mongoose.Schema({
     membershipFee: Number,
     feePaid: {type:Boolean,default: false},
     visitorsSales: Number,
-    salesPaid: {type:Boolean,default: false},
-    billRents:[{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Rent'
-    }]
+    salesPaid: {type:Boolean,default: false}
 });
 
 const UserSchema = new mongoose.Schema({
@@ -45,6 +36,8 @@ const UserSchema = new mongoose.Schema({
             message: '${value} is not a valid email'
         }
     },
+    handy: String,
+    festnetz: String,
     password:{
         type: String,
         required: true
@@ -86,40 +79,10 @@ const UserSchema = new mongoose.Schema({
         type : String,
         trim : true
     },
-    contacts: [contactSchema],
     memberships:[membershipSchema],
     bills:[billSchema],
     mitID: Number
 });
-
-// UserSchema.methods.toJSON = function() {
-//     var user = this;
-//     var userObject = user.toObject();
-
-//     return _.pick(userObject,['_id','username','email']);
-// };
-
-// UserSchema.methods.generateAuthToken = function() {
-//     var user = this;
-//     var access = 'auth';
-//     var token = jwt.sign({_id: user._id.toHexString(), access}, process.env.JWT_SECRET).toString();
-
-//     user.tokens.push({access, token});
-
-//     return user.save();//.then(() => {
-//     //     return token;
-//     // });
-// };
-
-// UserSchema.methods.removeTokens = function(){
-//     var user = this;
-
-//     return user.update({
-//         $pull: {
-//             tokens: {}
-//         }
-//     });
-// };
 
 UserSchema.statics.findByCredentials = function(username,password){
  var User= this;
@@ -140,23 +103,6 @@ UserSchema.statics.findByCredentials = function(username,password){
     });
  });
 };
-
-// UserSchema.statics.findByToken = function (token){
-//     var User = this;
-//     var decoded;
-
-//     try {
-//         decoded=jwt.verify(token,process.env.JWT_SECRET);
-//     } catch (err) {
-//         return Promise.reject();
-//     }
-
-//     return User.findOne({
-//         '_id': decoded._id,
-//         'tokens.token': token,
-//         'tokens.access':'auth'
-//     });
-// };
 
 UserSchema.pre('save', function(next){
     var user = this;

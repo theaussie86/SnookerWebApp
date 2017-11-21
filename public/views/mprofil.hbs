@@ -6,59 +6,96 @@
     {{> header}}
         <div id="members">
             <div class="row my-5">
-                <div class="col-md-2">
+                <div class="col-lg-3 col-md-4">
                     {{> sidebar}}
                 </div>
-                <div class="col-md-10 p-1">
+                <div class="col-lg-9 col-md-8">
                     <div class="jumbotron" id="members-caption">
                         {{> alerts}}                        
                         <div class="tab-content d-block" id="myTabContent">
                             <div class="tab-pane fade show active" id="dashboard" role="tabpanel" aria-labelledby="dashboard-tab">
                                 <form>
                                     <div class="form-row">
-                                        <div class="form-group col-md-6">
-                                        <label for="inputEmail4">Email</label>
-                                        <input type="email" class="form-control" id="inputEmail4" placeholder="Email">
-                                        </div>
-                                        <div class="form-group col-md-6">
-                                        <label for="inputPassword4">Password</label>
-                                        <input type="password" class="form-control" id="inputPassword4" placeholder="Password">
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="inputAddress">Address</label>
-                                        <input type="text" class="form-control" id="inputAddress" placeholder="1234 Main St">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="inputAddress2">Address 2</label>
-                                        <input type="text" class="form-control" id="inputAddress2" placeholder="Apartment, studio, or floor">
-                                    </div>
-                                    <div class="form-row">
-                                        <div class="form-group col-md-6">
-                                        <label for="inputCity">City</label>
-                                        <input type="text" class="form-control" id="inputCity">
+                                        <div class="form-group col-md-4">
+                                        <label for="username">Username</label>
+                                        <input type="text" class="form-control" name="username" id="username" placeholder="{{user.username}}" readonly>
                                         </div>
                                         <div class="form-group col-md-4">
-                                        <label for="inputState">State</label>
-                                        <select id="inputState" class="form-control">
-                                            <option selected>Choose...</option>
-                                            <option>...</option>
-                                        </select>
+                                        <label for="vorname">Vorname</label>
+                                        <input type="text" class="form-control" name="vorname" id="vorname" placeholder="{{user.firstname}}" readonly>
                                         </div>
-                                        <div class="form-group col-md-2">
-                                        <label for="inputZip">Zip</label>
-                                        <input type="text" class="form-control" id="inputZip">
+                                        <div class="form-group col-md-4">
+                                        <label for="nachname">Nachname</label>
+                                        <input type="text" class="form-control" name="nachname" id="nachname" placeholder="{{user.lastname}}" readonly>
                                         </div>
                                     </div>
+                                    <hr>
                                     <div class="form-group">
-                                        <div class="form-check">
-                                        <label class="form-check-label">
-                                            <input class="form-check-input" type="checkbox"> Check me out
-                                        </label>
+                                        <label for="email">Emailadresse</label>
+                                        <input type="text" class="form-control" name="email" id="email" placeholder="{{user.email}}" readonly>
+                                        {{#if user.handy}}
+                                        <label for="handy">Handynummer</label>
+                                        <input type="text" class="form-control" name="handy" id="handy" placeholder="{{user.handy}}" readonly>
+                                        {{/if}}
+                                        {{#if user.festnetz}}
+                                        <label for="festnetz">Festnetznummer</label>
+                                        <input type="text" class="form-control" name="festnetz" id="festnetz" placeholder="{{user.festnetz}}" readonly>
+                                        {{/if}}
+                                    </div>
+                                    <hr>
+                                    <div class="form-group">
+                                        <div class="form-row">
+                                            <div class="form-group col-md-12">
+                                                <label for="strasse">Straße</label>
+                                                <input type="text" class="form-control" name="strasse" id="strasse" placeholder="{{user.street}}" readonly>
+                                            </div>
+                                        </div>
+                                         <div class="form-row">
+                                            <div class="form-group col-md-4">
+                                                <label for="plz">Postleitzahl</label>
+                                                <input type="text" class="form-control" name="plz" id="plz" placeholder="{{user.zip}}" readonly>
+                                            </div>
+                                            <div class="form-group col-md-8">
+                                                <label for="ort">Wohnort</label>
+                                                <input type="text" class="form-control" name="ort" id="ort" placeholder="{{user.city}}" readonly>
+                                            </div>
                                         </div>
                                     </div>
-                                    <button type="submit" class="btn btn-primary">Sign in</button>
-                                </form>                              
+                                    {{!-- <div class="form-row">
+                                        <div class="form-group col-3 hidden">
+                                        <button class="btn btn-primary">Ändern</button>
+                                        </div>
+                                        <div class="form-group col-3">
+                                        <button class="btn btn-primary">Adresse ändern</button>
+                                        </div>
+                                    </div>                                     --}}
+                                </form>
+                                <hr>
+                                <div class="row">
+                                    <p>
+                                        <h5>Mitgliedschaften</h5>
+                                    </p>
+                                    <table id="membershipsTable" class="table table-border table-dark">
+                                    <thead>
+                                        <tr>
+                                        <th>Mitgliedschaft</th>
+                                        <th>Beitrag</th>
+                                        <th>Start</th>
+                                        <th>Ende</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="myMemberships">
+                                        {{#each user.memberships}}
+                                        <tr>
+                                        <td>{{membershipType}}</td>
+                                        <td>{{formatCurrency membershipFee}}</td>
+                                        <td>{{formatDate membershipStart}}</td>
+                                        <td>{{formatDate membershipEnd}}</td>
+                                        </tr>
+                                        {{/each}}
+                                    </tbody>
+                                    </table>
+                                </div>                              
                             </div>
                         </div>
                     </div>

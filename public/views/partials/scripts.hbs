@@ -8,8 +8,9 @@
             $( this ).addClass( 'active' ).siblings().removeClass( 'active' );
         } );
 
+        $('#datum').val(moment().format('YYYY-MM-DD'));
+
         $("#fileUploadField").on("change", function() {
             $("#formId").submit();
         });
-
     </script>

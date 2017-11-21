@@ -85,6 +85,7 @@ importRouter.get('/test',(req,res)=>{
 });
 
 importRouter.get('/bills',(req,res)=>{
+
     User.find({}, (err, users)=>{
         if (err) throw err;
     }).cursor().on('data',async (user)=>{
@@ -106,7 +107,7 @@ importRouter.get('/bills',(req,res)=>{
                         _member: userId,
                         datum:{$gte: new Date(start.getFullYear(),start.getMonth()-1,1,12), $lte: new Date(start.getFullYear(),start.getMonth(),0,12)}
                     });
-                    const ids = await rents.map((rent)=>rent._id);
+                    // const ids = await rents.map((rent)=>rent._id);
                     const sales = await rents.reduce((sum, rent)=>{
                         var guests;
                         if (rent.onlyGuests){
@@ -125,7 +126,7 @@ importRouter.get('/bills',(req,res)=>{
                             feePaid: true,
                             visitorsSales: sales,
                             salesPaid: true,
-                            billRents: ids
+                            // billRents: ids
                         });
                         await user.save();
                         // console.log(`+++++++++++ENDE: ${start}+++++++++++++`);
