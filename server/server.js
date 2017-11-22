@@ -89,12 +89,17 @@ hbs.registerHelper('getCurrentYear',() => {
 });
 
 hbs.registerHelper('formatDate',(date)=>{
-    return moment(date).format('DD.MM.YYYY');
-})
+    if (moment(date).unix()===0){
+        return "";
+    } else {
+        return moment(date).format('DD.MM.YYYY');
+    }
+});
 
 hbs.registerHelper('formatCurrency',(num)=>{
     return num.toFixed(2).replace('.',',')+' €';
-})
+});
+
 // Login, Logout, Register, Reset
 // Homepage
 app.get('/',(req,res)=>{
@@ -560,7 +565,16 @@ app.post('/login', CheckLoginForm, passport.authenticate('login',{
         }
         newRent._member=req.user._id;
         newRent.save().then((doc)=>{
-            req.flash('success_msg',`Gespeichert bei ${req.user.username}.`);
+            var guests;
+            if (doc.onlyGuests){
+                guests=2;
+            } else{
+                guests=1;
+            }
+
+            var betrag = (Math.ceil((doc.ende-doc.start)*3.5/360000)*guests/10).toFixed(2).replace('.',',')+' €';
+
+            req.flash('success_msg',`${doc.player1} und ${doc.player2}; Rechnungsbetrag: ${betrag}; Abgerechnet bei: ${req.user.username}.`);
             res.redirect('/entervisitor');
         },(e)=>{
             req.flash('error_msg',`Beim Abspeichern gab es ein Problem. ${e}. Versuchen Sie es erneut.`);
@@ -573,6 +587,61 @@ app.post('/login', CheckLoginForm, passport.authenticate('login',{
         res.render('mprofil.hbs',{
             title: 'Mein  Profil',
             user: req.user
+        });
+    });
+
+    app.post('/profile',isLoggedIn, (req,res)=>{
+        var body = req.body;
+        var info = "Keine Änderungen!";  
+        User.findById(req.user._id).then(async (user)=>{ 
+            if(body.username && user.username != body.username) {
+                await Break.update({_member: user._id},{$set:{player:body.username}},{multi: true}).exec();
+                await Rent.update({
+                    _member: req.user._id,
+                    onlyGuests: false,
+                    player1: req.user.username
+                },{$set:{player1: body.username}},{multi:true}).exec();
+                await Rent.update({
+                    _member: req.user._id,
+                    onlyGuests: false,
+                    player2: req.user.username
+                },{$set:{player2: body.username}},{multi:true}).exec();
+
+                user.username = body.username;
+                info=`Username in ${body.username} geändert.\n`;
+            }
+
+            if(body.email && user.email != body.email) {
+                user.email = body.email;              
+                info=info+`Email auf ${body.email} geändert.\n`;
+            }
+
+            if(body.handy && user.handy != body.handy) {
+                user.handy = body.handy;                
+                info=info+`Handynummer zu ${body.handy} geändert.\n`;
+            }
+
+            if(body.strasse && user.street != body.strasse) {
+                user.street = body.strasse;                
+                info=info+`Straße in ${body.strasse} geändert.\n`;
+            }
+
+            if(body.plz && user.zip != body.plz) {
+                user.zip = body.plz;                
+                info=info+`PLZ auf ${body.plz} geändert.\n`;
+            }
+
+            if(body.ort && user.city != body.ort) {
+                user.city = body.ort;                
+                info=info+`Wohnort in ${body.ort} geändert.\n`;
+            }
+            user.save().then((doc)=>{
+                req.flash('success_msg','Gespeichert! '+info);
+                res.redirect('/profile');
+            });
+        }).catch((e)=>{
+            req.flash('error_msg','Fehler! '+e);
+            res.redirect('/profile');    
         });
     });
         
