@@ -84,6 +84,8 @@ app.use((req, res, next) => {
 
 app.use(express.static(publicPath));
 
+moment.locale('de');
+
 hbs.registerHelper('getCurrentYear',() => {
     return new Date().getFullYear();
 });
@@ -96,8 +98,19 @@ hbs.registerHelper('formatDate',(date)=>{
     }
 });
 
+hbs.registerHelper('formatMonthYear',(date)=>{
+    return moment(date).format('MMMM YYYY');
+});
+
 hbs.registerHelper('formatCurrency',(num)=>{
     return num.toFixed(2).replace('.',',')+' €';
+});
+
+hbs.registerHelper('ifCond', function(v1, v2, options) {
+    if(v1 === v2) {
+      return options.fn(this);
+    }
+    return options.inverse(this);
 });
 
 // Login, Logout, Register, Reset
@@ -475,32 +488,28 @@ app.post('/login', CheckLoginForm, passport.authenticate('login',{
     });
 
     app.get('/bills',isLoggedIn,(req,res)=>{
-        res.render('mbills.hbs',{
-            title: 'Meine Rechnungen',
-            user: req.user
-        });
-    });
-
-    app.get('/bills/get',isLoggedIn,async (req, res)=>{
         const bills = req.user.bills;
-
+        
         bills.sort(function (a, b) {
             if (a.billDate > b.billDate) {
-              return -1;
+                return -1;
             }
             if (a.billDate < b.billDate) {
-              return 1;
+                return 1;
             }
             return 0;
         });
 
-            if (!bills){
-                console.log('keine Rechnungen gefunden.')
-                res.status(404).send({
-                    "info_msg":"Du hast noch keine Rechnungen."
-                });
-            }
-            res.send(bills);
+        res.render('mbills.hbs',{
+            title: 'Meine Rechnungen',
+            user: req.user,
+            bills: bills
+        });
+    });
+
+    app.get('/bills/get',isLoggedIn, (req, res)=>{
+        var user = _.pick(req.user,['firstname','lastname','street','zip','city','mitID']);
+        res.send(user);
     });
 
     app.get('/bills/single/:time',isLoggedIn,(req,res)=>{
@@ -642,6 +651,12 @@ app.post('/login', CheckLoginForm, passport.authenticate('login',{
         }).catch((e)=>{
             req.flash('error_msg','Fehler! '+e);
             res.redirect('/profile');    
+        });
+    });
+
+    app.get('/template',(req, res)=>{
+        res.render('template.hbs',{
+            title: 'Rechnung'
         });
     });
         

@@ -20,30 +20,8 @@ module.exports.updateBreaksAndRents= ()=>{
 };
 
 module.exports.updateOldIds = () => {
-    User.update({},{$unset:{mitID:''}},{multi: true}).exec();
+    // User.update({},{$unset:{mitID:''}},{multi: true}).exec();
     Rent.update({},{$unset:{mitID:''}},{multi: true}).exec();
     Break.update({},{$unset:{mitID:''}},{multi: true}).exec(); 
     console.log('Alle alten IDs wurden gelöscht');
 };
-
-module.exports.fillBills=()=>{
-    User.find({}, (err, users)=>{
-        if (err) throw err;
-    }).cursor().on('data',(user)=>{
-        var userId = user._id;
-        user.memberships.forEach((element) => {
-            var start = element.membershipStart;
-            var ende = element.membershipEnd;
-            // while (start<=ende) {
-                Rent.find({
-                    _member: userId,
-                    datum:{$gte: start/*, $lte: start.setMonth(start.getMonth()+1)*/}
-                }).then((rents)=>{
-                    console.log(rents);
-                }).catch((e)=>console.log(e));
-            // }
-        });
-    }).on('end',()=>{
-        console.log('Alle Rechnungen erstellt.');
-    });
-}

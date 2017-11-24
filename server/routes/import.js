@@ -1,7 +1,7 @@
 const express = require('express');
 
 const {importSQLData} = require('./../db/import/import');
-const {updateBreaksAndRents,updateOldIds,fillBills}=require('./../db/import/update');
+const {updateBreaksAndRents,updateOldIds}=require('./../db/import/update');
 const {User} = require('./../models/user');
 const {Break} = require('./../models/break');
 const {Rent} = require('./../models/rent');
@@ -51,37 +51,11 @@ importRouter.get('/update',(req,res)=>{
                 req.flash('error_msg','Hier stimmt was nicht')
                 res.redirect('/');                
             }
-            fillBills();
         }).catch((e)=>{
             console.log(e);
             req.flash('error_msg',e)
             res.redirect('/');
         });
-});
-
-importRouter.get('/test',(req,res)=>{
-    Rent.aggregate([{$group: {
-        _id:{ Mitglied: "$_member", Monat: { $month: "$datum"}, Jahr: { $year: "$datum" } },
-        Umsätze:{ $push:{Datum: "$datum", Spieler1: "$player1", Spieler2: "$player2", nurGäste: "$onlyGuests"}}
-    }},{
-        $lookup:{
-            from: "users",
-            localField: "_id.Mitglied",
-            foreignField: "_id",
-            as: "MitgliedDetails"
-        }
-    },{
-        $project:{
-            "MitgliedDetails.username":1,
-            "_id.Monat":1,
-            "_id.Jahr":1,
-            "Umsätze": 1
-        }
-    }]).then((bills)=>{
-        res.send(bills);
-    },(err)=>{
-        res.send (err);
-    });
 });
 
 importRouter.get('/bills',(req,res)=>{
@@ -100,14 +74,12 @@ importRouter.get('/bills',(req,res)=>{
             } else {
                 ende = element.membershipEnd;
             }
-            // console.log(`User: ${user.username}, Start: ${start}, Ende: ${ende}`);
             while (start<ende) {
                 try {
                     const rents = await Rent.find({
                         _member: userId,
                         datum:{$gte: new Date(start.getFullYear(),start.getMonth()-1,1,12), $lte: new Date(start.getFullYear(),start.getMonth(),0,12)}
                     });
-                    // const ids = await rents.map((rent)=>rent._id);
                     const sales = await rents.reduce((sum, rent)=>{
                         var guests;
                         if (rent.onlyGuests){
@@ -117,19 +89,14 @@ importRouter.get('/bills',(req,res)=>{
                         }
                         return sum + (Math.ceil(3.5*(rent.ende-rent.start)/360000)*guests/10);
                     },0);
-                        // console.log(`+++++++++++START: ${start}+++++++++++++`);
-                        // console.log(`User: ${user.username}, Ende: ${ende}`);
-                        // console.log(`Gastumsatz: ${sales}, IDs: ${ids}`);
                         user.bills.push({
                             billDate : start,
                             membershipFee: element.membershipFee,
                             feePaid: true,
                             visitorsSales: sales,
                             salesPaid: true,
-                            // billRents: ids
                         });
                         await user.save();
-                        // console.log(`+++++++++++ENDE: ${start}+++++++++++++`);
                 } catch (error) {
                     console.log(err);
                     req.flash('error_msg',`Fehler: ${err}`);
@@ -137,13 +104,11 @@ importRouter.get('/bills',(req,res)=>{
                 }
                 start = new Date(start.getFullYear(),start.getMonth()+1,start.getDate(),12);                    
             }
-            // console.log(`User: ${user.username}, Ende: ${ende}`);                
         });
     }).on('end',()=>{
         console.log('Alle Rechnungen erstellt.');
         req.flash('success_msg','Alle Rechnungen erstellt');
         res.redirect('/');
-        // res.send('Fertig');
     });
     
 });
