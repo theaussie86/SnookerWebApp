@@ -8,7 +8,7 @@ const crypto = require('crypto');
 const {User} = require('./../models/user');
 const {Break} = require('./../models/break');
 const {Rent} = require('./../models/rent');
-const {isLoggedIn, isAdmin} = require('./../middleware/authenticate');
+const {isLoggedIn} = require('./../middleware/authenticate');
 
 var router = express.Router();
 
@@ -35,15 +35,6 @@ router.get('/logout', isLoggedIn, (req, res)=>{
     req.logout()
     req.flash('success_msg','Sie haben sich erfolgreich ausgeloggt.');
     res.redirect('/');
-});
-
-// REGISTER
-router.get('/register', isAdmin, (req,res)=>{
-    res.render('register.hbs',{
-        title: 'Registrieren',
-        user: req.user,
-        'info_msg':'Das Passwort muss mindestens eine Ziffer und einen Buchstaben enthalten und mindestens 6 Zeichen lang sein.'                
-    });
 });
 
 // RESET PASSWORD

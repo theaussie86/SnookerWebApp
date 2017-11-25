@@ -62,10 +62,10 @@ importRouter.get('/bills',(req,res)=>{
 
     User.find({}, (err, users)=>{
         if (err) throw err;
-    }).cursor().on('data',async (user)=>{
+    }).cursor().on('data',(user)=>{
         var userId = user._id;
-        await user.memberships.forEach(async(element) => {
-            var start = element.membershipStart;//setDate(0)
+        user.memberships.forEach(async(element) => {
+            var start = element.membershipStart;
             var ende;
             if (element.membershipEnd.getTime() ===0){
                 ende = new Date();
@@ -81,12 +81,8 @@ importRouter.get('/bills',(req,res)=>{
                         datum:{$gte: new Date(start.getFullYear(),start.getMonth()-1,1,12), $lte: new Date(start.getFullYear(),start.getMonth(),0,12)}
                     });
                     const sales = await rents.reduce((sum, rent)=>{
-                        var guests;
-                        if (rent.onlyGuests){
-                            guests = 2;
-                        } else {
-                            guests = 1;
-                        }
+                        var guests=1;
+                        if (rent.onlyGuests) guests = 2;
                         return sum + (Math.ceil(3.5*(rent.ende-rent.start)/360000)*guests/10);
                     },0);
                         user.bills.push({
@@ -97,8 +93,7 @@ importRouter.get('/bills',(req,res)=>{
                             salesPaid: true,
                         });
                         await user.save();
-                } catch (error) {
-                    console.log(err);
+                } catch (err) {
                     req.flash('error_msg',`Fehler: ${err}`);
                     res.redirect('/');            
                 }

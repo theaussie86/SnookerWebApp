@@ -20,15 +20,25 @@
                         <li class="nav-item">
                             <a class="nav-link" id="rechnungen-tab" href="/members/bills" role="tab" aria-controls="Rechnungen">Meine Rechnungen</a>
                         </li>
+                        {{#if user.isBoardMember}}
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" data-toggle="dropdown" data-target="#LoginModal" href="#">
+                            <a class="nav-link dropdown-toggle" data-toggle="dropdown" data-target="#" href="#">Vorstand</a>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" href="/board" role="button" aria-controls="dropdown1">Dashboard</a>                                
+                                <a class="dropdown-item" href="/board/members" role="button" aria-controls="dropdown2">Mitglieder verwalten</a>
+                                <a class="dropdown-item" href="/board/bills" role="button" aria-controls="dropdown3">Rechnungen verwalten</a>
+                                <a class="dropdown-item" href="/board/breaks" role="button" aria-controls="dropdown4">Breaks verwalten</a>
+                                <a class="dropdown-item" href="/board/visitors" role="button" aria-controls="dropdown5">Gastumsätze verwalten</a>
+                                <a class="dropdown-item" href="/board/register" role="button" aria-controls="dropdown6">Registrieren</a>
+                            </div>
+                        </li> 
+                        {{/if}}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" data-toggle="dropdown" data-target="#" href="#">
                                 Hallo <span id="srtUser">{{user.username}}</span>
                             </a>
                             <div class="dropdown-menu">
                                 <a class="dropdown-item" href="/data/profile" role="button" aria-controls="dropdown1">Profil</a>
-                                {{#if user.isBoardMember}}
-                                <a class="dropdown-item" href="/register" role="button" aria-controls="dropdown2">Registrieren</a>
-                                {{/if}}
                                 <a class="dropdown-item" href="/logout" role="button" aria-controls="dropdown3">Logout</a>
                             </div>
                         </li> 

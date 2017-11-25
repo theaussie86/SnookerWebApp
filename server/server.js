@@ -28,6 +28,7 @@ const {importRouter} = require('./routes/import');
 const {router}=require('./routes/index');
 const {memberroutes}=require('./routes/member');
 const {dataroutes}=require('./routes/data');
+const {boardroutes}=require('./routes/board');
 const {isLoggedIn, isAdmin, CheckLoginForm, CheckRegisterForm} = require('./middleware/authenticate');
 const {fillBills} = require('./db/import/update');
 
@@ -58,6 +59,7 @@ app.use((req, res, next)=>{
     next();
 });
 
+// Passport Middleware
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 app.use(validator());
@@ -69,11 +71,14 @@ app.use('/import',importRouter);
 app.use('/',router);
 app.use('/members',memberroutes);
 app.use('/data',dataroutes);
+app.use('/board',boardroutes);
 
+// Middleware hbs
 app.set('views',publicPath+'/views');
 hbs.registerPartials(publicPath+ '/views/partials');
 app.set('view engine','hbs');
 
+// server log
 app.use((req, res, next) => {
     var now = new Date().toString();
     var log = `${now}: ${req.method} ${req.url}`;
@@ -139,12 +144,6 @@ app.post('/register', CheckRegisterForm, passport.authenticate('register',{
     failureRedirect: '/register',
     failureFlash: true
 }));
-     
-    app.get('/board', (req, res) =>{
-        res.render('board.hbs',{
-            title: 'Vorstand'
-        });
-    });
 
 app.listen(app.get('port'), () => {
     console.log(`Server started on port ${app.get('port')}`);
