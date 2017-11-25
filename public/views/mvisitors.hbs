@@ -6,12 +6,13 @@
     {{> header}}
 
         <div id="members">
-            <div class="row my-5">
+            <div class="row">
                 <div class="col-lg-3 col-md-4">
                     {{> sidebar}}
                 </div>
                 <div class="col-lg-9 col-md-8">
                     <div class="jumbotron" id="members-caption">
+                        {{#if umsatz}}
                         <div class="row">
                             <div class="col-4">
                             <select id="month" class="custom-select d-block my-3">
@@ -35,8 +36,9 @@
                                 <option value="0">Jahr auswählen</option>
                             </select>
                             </div>
-                            <div class="col-2"><p class="align-bottom">Summe der Umsätze: <br><strong id="Umsatzsumme"></strong></p></div>
+                            <div class="col-2"><p class="align-bottom">Summe der Umsätze: <br><strong id="Umsatzsumme">{{formatCurrency umsatz}}</strong></p></div>
                         </div>
+                        {{/if}}
                         {{> alerts}}                        
                         <p><h5>Meine Umsätze mit Gastspielern</h5></p>
                         <table class="table table-border">
@@ -49,6 +51,14 @@
                             </tr>
                         </thead>
                         <tbody id="myVisitors">
+                            {{#each rents}}
+                            <tr>
+                            <td>{{formatDate datum}}</td>
+                            <td>{{player}}</td>
+                            <td>{{spielzeit}}</td>
+                            <td>{{formatCurrency betrag}}</td>
+                            </tr>
+                            {{/each}}
                         </tbody>
                         </table>
                     </div>
@@ -62,6 +72,6 @@
 
         {{> scripts}}
         <!-- Additional JavaScript -->
-        <script type="text/javascript" src="js/visitors.js"></script>
+        <script type="text/javascript" src="/js/visitors.js"></script>
     </body>
 </html>

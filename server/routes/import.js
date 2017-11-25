@@ -65,12 +65,12 @@ importRouter.get('/bills',(req,res)=>{
     }).cursor().on('data',async (user)=>{
         var userId = user._id;
         await user.memberships.forEach(async(element) => {
-            var start = element.membershipStart;
+            var start = element.membershipStart;//setDate(0)
             var ende;
             if (element.membershipEnd.getTime() ===0){
                 ende = new Date();
                 ende.setDate(1);
-                ende.setHours(1);
+                ende.setHours(12);
             } else {
                 ende = element.membershipEnd;
             }

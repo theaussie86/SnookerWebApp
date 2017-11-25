@@ -19,7 +19,7 @@ $(function(){
         $('#tblumsatz').empty();        
         $.ajax({
             type: 'GET',
-            url: '/bills/single/'+datum,
+            url: '/members/bills/single/'+datum,
             success: function(rents){
                 var output= rents.map((rent)=>{
                     var onlyguest=1;
@@ -105,7 +105,7 @@ $(function(){
         var dueDate = moment(new Date(jahr,monat,0)).format('DD.MM.YYYY');
         $.ajax({
             type: 'GET',
-            url: '/bills/get',
+            url: '/members/bills/getUser',
             success: function(user){
                 var billnumber = jahr+'-'+monat+'-'+user.mitID; 
                 var doc = new jsPDF({

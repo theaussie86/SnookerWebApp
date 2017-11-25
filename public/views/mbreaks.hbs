@@ -5,34 +5,40 @@
     <body>
     {{> header}}
         <div id="members">
-            <div class="row my-5">
+            <div class="row">
                 <div class="col-lg-3 col-md-4">
                     {{> sidebar}}
                 </div>
                 <div class="col-lg-9 col-md-8">
                     <div class="jumbotron" id="members-caption">
-                        {{> alerts}}                        
-                        {{!-- <div class="tab-content d-block" id="myTabContent"> --}}
-                            {{!-- <div class="tab-pane" id="breaks" role="tabpanel" aria-labelledby="rechnung-tab"> --}}
-                                <div class="container">
-                                    <p>
-                                        <h5>Meine Breaks</h5>
-                                    </p>
-                                    <table class="table table-border table-light">
-                                    <thead>
-                                        <tr>
-                                        <th>Rang</th>
-                                        <th>Datum</th>
-                                        <th>Spieler</th>
-                                        <th>Break</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="myBreaks">
-                                    </tbody>
-                                    </table>
-                                </div>
-                            {{!-- </div>                        --}}
-                        {{!-- </div> --}}
+                        {{> alerts}}
+                        <div class="container">
+                            <p>
+                                <h5>Meine Breaks</h5>
+                            </p>
+                            <table class="table table-border table-light">
+                            <thead>
+                                <tr>
+                                <th>Rang</th>
+                                <th>Datum</th>
+                                <th>Spieler</th>
+                                <th>Break</th>
+                                </tr>
+                            </thead>
+                            <tbody id="myBreaks">
+                                {{#if breaks}}
+                                {{#each breaks}}
+                                <tr>
+                                <th>{{inc @index}}.</th>
+                                <td>{{formatDate datum}}</td>
+                                <td>{{player}}</td>
+                                <td>{{break}}</td>
+                                </tr>                                
+                                {{/each}}
+                                {{/if}}
+                            </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -44,6 +50,5 @@
         
         {{> scripts}}
         <!-- Additional JavaScript -->
-        <script type="text/javascript" src="js/breaks.js"></script>
     </body>
 </html>

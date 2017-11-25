@@ -24,3 +24,9 @@
             {{success_msg}}
         </div>
     {{/if}}
+    {{#if err}}
+        <div class="alert small alert-danger alert-dismissable ">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close" title="close">×</a>
+            {{err}}
+        </div>
+    {{/if}}

@@ -1,5 +1,5 @@
 <header>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <a class="navbar-brand" href="/">Snookerclub Neubrandenburg</a>
         <button class="navbar-toggler float-right" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon float-right"></span>
@@ -8,36 +8,31 @@
             <div class="navbar-nav">
                 <ul class="nav navbar-nav">
                     {{#if user}}
-                        {{#if user.isBoardMember}}
-                        <li class="nav-item">
-                            <a class="nav-link" id="register-tab" href="/register" role="tab" aria-controls="Registrierung">Registrieren</a>
-                        </li>
-                        {{/if}}
                         <li class="nav-item">
                             <a class="nav-link" id="übersicht-tab" href="/members" role="tab" aria-controls="Übersicht" aria-expanded="true">Übersicht</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" id="gastspieler-tab" href="/visitors" role="tab" aria-controls="Gastspieler">Gastspieler</a>
+                            <a class="nav-link" id="gastspieler-tab" href="/members/visitors" role="tab" aria-controls="Gastspieler">Meine Gäste</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" id="breaks-tab" href="/breaks" role="tab" aria-controls="Breaks">Breaks</a>
+                            <a class="nav-link" id="breaks-tab" href="/members/breaks" role="tab" aria-controls="Breaks">Meine Breaks</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" id="rechnungen-tab" href="/bills" role="tab" aria-controls="Rechnungen">Rechnungen</a>
+                            <a class="nav-link" id="rechnungen-tab" href="/members/bills" role="tab" aria-controls="Rechnungen">Meine Rechnungen</a>
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" data-toggle="dropdown" data-target="#LoginModal" href="#">
                                 Hallo <span id="srtUser">{{user.username}}</span>
                             </a>
                             <div class="dropdown-menu">
-                                <a class="dropdown-item" href="/profile" role="button" aria-controls="dropdown1">Profil</a>
-                                <a class="dropdown-item" href="/logout" role="button" aria-controls="dropdown2">Logout</a>
+                                <a class="dropdown-item" href="/data/profile" role="button" aria-controls="dropdown1">Profil</a>
+                                {{#if user.isBoardMember}}
+                                <a class="dropdown-item" href="/register" role="button" aria-controls="dropdown2">Registrieren</a>
+                                {{/if}}
+                                <a class="dropdown-item" href="/logout" role="button" aria-controls="dropdown3">Logout</a>
                             </div>
                         </li> 
                     {{else}}
-                        <li class="nav-item">
-                            <a class="nav-link" id="template-tab" href="/template" role="tab" aria-controls="Template" aria-expanded="true">Vorlage</a>
-                        </li>
                         {{!-- <li class="nav-item">
                             <a class="nav-link" href="/feature-one">Info</a>
                         </li> --}}
