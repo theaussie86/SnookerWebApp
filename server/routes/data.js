@@ -18,6 +18,7 @@ dataroutes.get('/enterbreak',isLoggedIn,(req,res)=>{
 
 dataroutes.post('/enterbreak',isLoggedIn,(req,res)=>{
     var body = _.pick(req.body,['datum','player','break']);
+    body.datum= new Date(body.datum).setHours(12);
     let newBreak = new Break(body);
     if (!req.body.player){
         newBreak.player = req.user.username;

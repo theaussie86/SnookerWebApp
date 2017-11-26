@@ -64,18 +64,10 @@ img{
 
 #board{
     background: rgb(20, 146, 20);
-    background-size: cover;
-    height: 100%;
-    width: 100%;
-    align-items: center;
 }
 
 #members{
     background: #000000;
-    /* background-size: cover;
-    height: 100%;
-    width: 100%; 
-    align-items: center;*/
 }
 
 #board-caption, #members-caption{

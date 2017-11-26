@@ -12,12 +12,66 @@
                 <div class="col-lg-9 col-md-8">
                     <div class="jumbotron" id="board-caption">
                         {{> alerts}}
-                        <div class="tab-pane fade show active" id="bmembers" role="tabpanel" aria-labelledby="dashboard-tab">
-                            Mitgliederverwaltung
+                        <div class="container" id="bmembers" role="tabpanel" aria-labelledby="dashboard-tab">
+                            <p>
+                                <h5>Mitgliederverwaltung</h5>
+                            </p>
+                            <table id="membersTable" class="table table-border table-light table-hover">
+                            <thead>
+                                <tr>
+                                <th>Username</th>
+                                <th>Vorname</th>
+                                <th>Nachname</th>
+                                </tr>
+                            </thead>
+                            <tbody id="allMembers">
+                                {{#each members}}
+                                <tr class="{{#if isBoardMember}} table-info{{/if}}{{#unless aktiv}} table-active{{/unless}}">
+                                    <td>{{username}}</td>
+                                    <td>{{firstname}}</td>
+                                    <td>{{lastname}}</td>
+                                </tr>
+                                {{/each}}
+                            </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
             </div>
+        {{!-- <div class="modal fade" id="membersModal" tabindex="-1" role="dialog" aria-labelledby="billModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="membersModalLabel"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+
+                    <div class="row my-3">
+                        <div id="umsatz" class="col-12">
+
+                        </div>
+                    </div>
+                    <div class="row my-2">
+                        <div id="lblsumme" class="col-md-4 font-weight-bold"></div>
+                        <div id="summe" class="col-md-4 ml-auto font-weight-bold"></div>
+                    </div>
+                    <div class="row align-items-end">
+                        <div id="lblBeitrag" class="col-md-4 font-weight-bold">Beitrag:</div>
+                        <div id="beitrag" class="col-md-4 ml-auto font-weight-bold"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Schließen</button>
+                <button id="downloadBill" type="button" class="btn btn-primary">Rechnung herunterladen</button>
+            </div>
+            </div>
+        </div>
+        </div> --}}
         </div>
     {{> footer}}
         <!-- Optional JavaScript -->

@@ -1,4 +1,5 @@
 const express = require('express');
+const he = require('he');
 
 const {User} = require('./../models/user');
 const {Break} = require('./../models/break');
@@ -17,17 +18,56 @@ boardroutes.get('/',isAdmin, (req, res) =>{
 
 // MEMBERS
 boardroutes.get('/members',isAdmin,(req,res)=>{
-    res.render('bmembers.hbs',{
-        title: 'Mitgliederverwaltung',
-        user: req.user
+    User.find({}).then((docs)=>{
+        var members=docs.map((x)=>{
+            return {
+                username: x.username,
+                firstname: x.firstname,
+                lastname: x.lastname,
+                aktiv: x.aktiv,
+                isBoardMember: x.isBoardMember
+            }
+        });
+        res.render('bmembers.hbs',{
+            title: 'Mitgliederverwaltung',
+            user: req.user,
+            members: members
+        });
+    },(err)=>{
+        req.flash('error_msg','Es ist ein Fehler aufgetreten.\n'+err);
+        res.redirect('/board');
     });
+
 });
 
 // BREAKS
 boardroutes.get('/breaks',isAdmin,(req,res)=>{
-    res.render('bbreaks.hbs',{
-        title: 'Breakverwaltung',
-        user: req.user
+    Break.find({}).sort({datum: -1}).then((breaks)=>{
+        res.render('bbreaks.hbs',{
+            title: 'Breakverwaltung',
+            user: req.user,
+            breaks: breaks
+        });
+    },(err)=>{
+        req.flash('error_msg','Es ist ein Fehler aufgetreten.\n'+err);
+        res.redirect('/board');
+    });
+});
+
+boardroutes.get('/delete/:datum/:player/:break',isAdmin,(req,res)=>{
+    var dateParts = req.params.datum.split('.');
+    var dat = new Date(dateParts[2],dateParts[1]-1,dateParts[0],12);
+    var player = he.decode(req.params.player);
+    Break.findOneAndRemove({
+        datum: dat,
+        player: player,
+        break: req.params.break
+    },(err, serie)=>{ 
+        if(err){
+            return req.flash({'error_msg':`Es ist ein Fehler aufgetreten. ${err}.`});
+        }
+        req.flash('success_msg',`Break ${serie.break} von ${serie.player} wurde gelöscht.`)
+        res.send(serie);
     });
 });
 
