@@ -81,7 +81,7 @@ dataroutes.get('/profile',isLoggedIn,(req,res)=>{
 
 dataroutes.post('/profile',isLoggedIn, (req,res)=>{
     var body = req.body;
-    var info = "Keine Änderungen!";  
+    var info = "";  
     User.findById(req.user._id).then(async (user)=>{ 
         if(body.username && user.username != body.username) {
             await Break.update({_member: user._id},{$set:{player:body.username}},{multi: true}).exec();
@@ -124,6 +124,7 @@ dataroutes.post('/profile',isLoggedIn, (req,res)=>{
             user.city = body.ort;                
             info=info+`Wohnort in ${body.ort} geändert.\n`;
         }
+        if (info === "") info = "Keine Änderungen!";
         user.save().then((doc)=>{
             req.flash('success_msg',info);
             res.redirect('/data/profile');

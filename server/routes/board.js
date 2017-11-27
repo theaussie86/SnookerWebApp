@@ -54,7 +54,7 @@ boardroutes.get('/breaks',isAdmin,(req,res)=>{
     });
 });
 
-boardroutes.get('/delete/:datum/:player/:break',isAdmin,(req,res)=>{
+boardroutes.get('/deletebreak/:datum/:player/:break',isAdmin,(req,res)=>{
     var dateParts = req.params.datum.split('.');
     var dat = new Date(dateParts[2],dateParts[1]-1,dateParts[0],12);
     var player = he.decode(req.params.player);
@@ -68,6 +68,57 @@ boardroutes.get('/delete/:datum/:player/:break',isAdmin,(req,res)=>{
         }
         req.flash('success_msg',`Break ${serie.break} von ${serie.player} wurde gelöscht.`)
         res.send(serie);
+    });
+});
+
+boardroutes.get('/editbreak/:datum/:player/:break',isAdmin,(req,res)=>{
+    var dateParts = req.params.datum.split('.');
+    var dat = new Date(dateParts[2],dateParts[1]-1,dateParts[0],12);
+    var player = he.decode(req.params.player);
+    Break.findOne({
+        datum: dat,
+        player: player,
+        break: req.params.break
+    },(err, serie)=>{ 
+        if(err) throw err;
+        res.send(serie);
+    });
+});
+
+boardroutes.post('/editbreak',isAdmin,(req,res)=>{
+    var body = req.body;
+    var dateParts = body.datum.split('.');
+    var dat = new Date(dateParts[2],dateParts[1]-1,dateParts[0],12);
+    var player = he.decode(body.player);
+    var info = "Keine Änderungen!";  
+    Break.findOne({
+        datum: dat,
+        player: player,
+        break: body.break
+    }).then(async (serie)=>{ 
+        var info="";
+        if(body.player) {
+            // serie.player = body.player;              
+            info=info+`Spieler in ${body.player} geändert.\n`;
+        }
+
+        if(body.Datum) {
+            // serie.datum = body.datum;                
+            info=info+`Datum auf den ${body.datum} geändert.\n`;
+        }
+
+        if(body.break) {
+            // user.street = body.strasse;                
+            info=info+`Break in ${body.break} geändert.\n`;
+        }
+        if(info === "") info= "Keine Änderungen!"
+        // user.save().then((serie)=>{
+            res.send({'success_msg':info});
+            // res.redirect('/board/breaks');
+        // });
+    }).catch((e)=>{
+        req.flash('error_msg','Fehler! '+e);
+        res.redirect('/board/breaks');    
     });
 });
 
