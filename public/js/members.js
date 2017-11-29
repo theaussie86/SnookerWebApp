@@ -1,5 +1,5 @@
 $(function(){
-
+    moment.locale('de');
     $.ajax({
         type: 'GET',
         url: '/members/hbreaks',
@@ -40,12 +40,23 @@ $(function(){
         type: 'GET',
         url: '/members/lastmonths',
         success: function(umsaetze){
-                var thisUmsatz = umsaetze[0].umsatz.toFixed(2).replace('.', ",");
-                var lastUmsatz = umsaetze[1].umsatz.toFixed(2).replace('.', ",");
-
                 $('#navbarNavAltMarkup').removeClass('show');
-                $('#thisMonth').append('<strong>'+thisUmsatz+' €</strong>');
-                $('#lastMonth').append('<strong>'+lastUmsatz+' €</strong>');
+            console.log(umsaetze);
+            console.log(moment().month(umsaetze[0]._id-1).format('MMMM'));
+
+            umsaetze.forEach((m) => {
+                var li = `<li>Umsatz Gäste ${moment().month(m._id-1).format('MMMM')}: <strong>${m.umsatz.toFixed(2).replace('.', ",")} €</strong></li>`
+                $('#Kennzahlen').append(li);                
+            });
+
+                // var thisUmsatz = umsaetze[0].umsatz.toFixed(2).replace('.', ",");
+                // var lastUmsatz = umsaetze[1].umsatz.toFixed(2).replace('.', ",");
+                // if (umsaetze.length)
+                // var lastLUmsatz = umsaetze[2].umsatz.toFixed(2).replace('.', ",");                
+
+                // $('#thisMonth').append('<strong>'+thisUmsatz+' €</strong>');
+                // $('#lastMonth').append('<strong>'+lastUmsatz+' €</strong>');
+                // $('#lastLMonth').append('<strong>'+lastLUmsatz+' €</strong>');                
         }
     });
 });

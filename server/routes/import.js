@@ -78,13 +78,14 @@ importRouter.get('/bills',(req,res)=>{
                 try {
                     const rents = await Rent.find({
                         _member: userId,
-                        datum:{$gte: new Date(start.getFullYear(),start.getMonth()-1,1,12), $lte: new Date(start.getFullYear(),start.getMonth(),0,12)}
+                        datum:{$gte: new Date(start.getFullYear(),start.getMonth(),1,12), $lte: new Date(start.getFullYear(),start.getMonth()+1,0,12)}
                     });
                     const sales = await rents.reduce((sum, rent)=>{
                         var guests=1;
                         if (rent.onlyGuests) guests = 2;
                         return sum + (Math.ceil(3.5*(rent.ende-rent.start)/360000)*guests/10);
                     },0);
+    
                         user.bills.push({
                             billDate : start,
                             membershipFee: element.membershipFee,
@@ -100,6 +101,31 @@ importRouter.get('/bills',(req,res)=>{
                 start = new Date(start.getFullYear(),start.getMonth()+1,start.getDate(),12);                    
             }
         });
+        if (user.memberships[user.memberships.length-1].membershipEnd.getTime() !==0) {
+            var end = user.memberships[user.memberships.length-1].membershipEnd;
+            console.log(user.username, user.memberships[user.memberships.length-1].membershipEnd);
+
+            Rent.find({
+                _member: userId,
+                datum:{$gte: new Date(end.getFullYear(),end.getMonth(),1,12), $lte: new Date(end.getFullYear(),end.getMonth()+1,0,12)}
+            }).then((rents)=>{
+
+                user.bills.push({
+                    billDate : new Date(end.getFullYear(),end.getMonth()+1,1,12),
+                    membershipFee: 0,
+                    feePaid: true,
+                    visitorsSales: rents.reduce((sum, rent)=>{
+                        var guests=1;
+                        if (rent.onlyGuests) guests = 2;
+                        return sum + (Math.ceil(3.5*(rent.ende-rent.start)/360000)*guests/10);
+                    },0),
+                    salesPaid: true,
+                });
+                user.save();
+            }).catch((e)=>{
+                throw e;
+            });
+        }
     }).on('end',()=>{
         console.log('Alle Rechnungen erstellt.');
         req.flash('success_msg','Alle Rechnungen erstellt');

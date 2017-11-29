@@ -36,8 +36,8 @@ module.exports = function(passport){
                     user.aktiv= active;
                     user.save();
                 }
+                if (!user.aktiv && user.isBoardMember) return done(null, user, req.flash('info_msg','Inaktiv, aber Administrator!'));                
                 if (!user.aktiv) return done(null, false, req.flash('error_msg', 'Sie sind kein aktives Mitglied mehr. Melden Sie sich wieder an.'));
-
                 return done(null, user);
             });
         });

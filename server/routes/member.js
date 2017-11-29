@@ -89,7 +89,7 @@ memberroutes.get('/lastmonths',(req,res)=>{
     },{
         $match:{
             year: new Date().getFullYear(),
-            $or:[{month:new Date().getMonth()},{month:new Date().getMonth()-1}]                
+            $or:[{month:new Date().getMonth()+1},{month:new Date().getMonth()},{month:new Date().getMonth()-1}]                
         }
     },{
         $group:{
