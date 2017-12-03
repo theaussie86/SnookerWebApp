@@ -9,12 +9,12 @@ $(function(){
         var datum = $tds[0].textContent.split(' ');
         var monat = moment().month(datum[0]).format('M');
         var Jahr = Number(datum[1]);
-        datum = new Date(Jahr,monat-1,1,12).getTime();
+        datum = new Date(Jahr,monat,1,12).getTime();
         var gast = $tds[1].textContent.trim();
         var beitrag = $tds[2].textContent.trim();
         // console.log(datum+', '+gast+', '+beitrag);
         $('#billModalLabel').text('Rechnung '+$tds[0].textContent);
-        $('#lblBeitrag').text('Beitrag '+$tds[0].textContent+':');
+        $('#lblBeitrag').text('Beitrag '+moment().month(monat).format('MMMM')+':');
         $('#beitrag').text(beitrag);
         $('#tblumsatz').empty();        
         $.ajax({
@@ -102,7 +102,8 @@ $(function(){
         var time= tempDate[1]+' '+tempDate[2];
         var monat = moment().month(tempDate[1]).format('MM');
         var jahr = Number(tempDate[2]);
-        var dueDate = moment(new Date(jahr,monat,0)).format('DD.MM.YYYY');
+        var dueDate = moment(new Date(jahr,Number(monat)+1,0)).format('DD.MM.YYYY');
+        console.log(dueDate);
         $.ajax({
             type: 'GET',
             url: '/members/bills/getUser',
@@ -164,7 +165,7 @@ $(function(){
                     doc.text(x1,263,'Bankverbindung');
                     doc.setFontSize(18);
                     doc.text(x1+w-52,200,'Summe: '+$sales);
-                    doc.text(x1+w-66,210,'Beitrag '+moment().month(tempDate[1]).format('MMM')+': '+$beitrag);
+                    doc.text(x1+w-66,210,'Beitrag '+moment().month(monat).format('MMM')+': '+$beitrag);
                     
 
                     // Kursiv

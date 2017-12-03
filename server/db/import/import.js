@@ -36,7 +36,7 @@ members.forEach(function(m) {
         });
     });
 
-    if (m.mit_spname==="Marian"||m.mit_spname==="Robert"||m.mit_spname==="Öschi"){
+    if (m.mit_spname==="Marian"||m.mit_spname==="Robert"||m.mit_spname==="Öschi" ||m.mit_spname==="Murat"){
         user.isBoardMember = true;
     }
 

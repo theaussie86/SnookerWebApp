@@ -1,4 +1,5 @@
 const express = require('express');
+const _ = require('lodash');
 
 const {importSQLData} = require('./../db/import/import');
 const {updateBreaksAndRents,updateOldIds}=require('./../db/import/update');
@@ -64,74 +65,92 @@ importRouter.get('/bills',(req,res)=>{
         if (err) throw err;
     }).cursor().on('data',(user)=>{
         var userId = user._id;
-        user.memberships.forEach(async(element) => {
+        var tempBills = [];
+        user.memberships.forEach(async (element) => {
             var start = element.membershipStart;
             var ende;
             if (element.membershipEnd.getTime() ===0){
                 ende = new Date();
-                ende.setDate(1);
+                ende.setDate(0);
                 ende.setHours(12);
             } else {
                 ende = element.membershipEnd;
             }
             while (start<ende) {
-                try {
-                    const rents = await Rent.find({
-                        _member: userId,
-                        datum:{$gte: new Date(start.getFullYear(),start.getMonth(),1,12), $lte: new Date(start.getFullYear(),start.getMonth()+1,0,12)}
+                var bill = user.bills.find((x)=>x.billDate.getTime()===new Date(start.getFullYear(),start.getMonth(),0,12));
+                if (!bill) {
+                    try {
+
+                        tempBills.push({
+                            billDate : new Date(start.getFullYear(),start.getMonth(),0,12),
+                            membershipFee: element.membershipFee,
+                            feePaid: true,
+                            visitorsSales: 0,
+                            salesPaid: true
+                            });
+                    } catch (err) {
+                        req.flash('error_msg',`Fehler: ${err}`);
+                        res.redirect('/');            
+                    }
+                }   
+                start = new Date(start.getFullYear(),start.getMonth()+1,start.getDate(),12);                    
+            }            
+        });
+        if (user.memberships[user.memberships.length-1].membershipEnd.getTime() !==0) {
+            var end = user.memberships[user.memberships.length-1].membershipEnd;
+            var endBill = user.bills.find((x)=>x.billDate.getTime()===new Date(end.getFullYear(),end.getMonth(),0,12));
+            if (!endBill){
+
+                    tempBills.push({
+                        billDate : new Date(end.getFullYear(),end.getMonth()+1,0,12),
+                        membershipFee: 0,
+                        feePaid: true,
+                        visitorsSales: 0,
+                        salesPaid: true
                     });
-                    const sales = await rents.reduce((sum, rent)=>{
+            }
+        }
+
+
+        user.bills= tempBills;   
+        
+        tempBills.forEach((bill,i) => {
+            var vdate = bill.billDate;
+            Rent.find({
+                _member: userId,
+                datum:{$gte: new Date(vdate.getFullYear(),vdate.getMonth(),1,12), $lte: new Date(vdate.getFullYear(),vdate.getMonth()+1,0,12)}
+            }, (err, rents)=>{
+                if (err) throw err;
+                var sales = rents.reduce((sum, rent)=>{
                         var guests=1;
                         if (rent.onlyGuests) guests = 2;
                         return sum + (Math.ceil(3.5*(rent.ende-rent.start)/360000)*guests/10);
                     },0);
-    
-                        user.bills.push({
-                            billDate : start,
-                            membershipFee: element.membershipFee,
-                            feePaid: true,
-                            visitorsSales: sales,
-                            salesPaid: true,
-                        });
-                        await user.save();
-                } catch (err) {
-                    req.flash('error_msg',`Fehler: ${err}`);
-                    res.redirect('/');            
-                }
-                start = new Date(start.getFullYear(),start.getMonth()+1,start.getDate(),12);                    
-            }
+                    user.bills[i].visitorsSales= sales;
+                    
+                    user.save();
+            }); 
         });
-        if (user.memberships[user.memberships.length-1].membershipEnd.getTime() !==0) {
-            var end = user.memberships[user.memberships.length-1].membershipEnd;
-            console.log(user.username, user.memberships[user.memberships.length-1].membershipEnd);
 
-            Rent.find({
-                _member: userId,
-                datum:{$gte: new Date(end.getFullYear(),end.getMonth(),1,12), $lte: new Date(end.getFullYear(),end.getMonth()+1,0,12)}
-            }).then((rents)=>{
-
-                user.bills.push({
-                    billDate : new Date(end.getFullYear(),end.getMonth()+1,1,12),
-                    membershipFee: 0,
-                    feePaid: true,
-                    visitorsSales: rents.reduce((sum, rent)=>{
-                        var guests=1;
-                        if (rent.onlyGuests) guests = 2;
-                        return sum + (Math.ceil(3.5*(rent.ende-rent.start)/360000)*guests/10);
-                    },0),
-                    salesPaid: true,
-                });
-                user.save();
-            }).catch((e)=>{
-                throw e;
-            });
-        }
     }).on('end',()=>{
         console.log('Alle Rechnungen erstellt.');
         req.flash('success_msg','Alle Rechnungen erstellt');
         res.redirect('/');
     });
     
+});
+
+importRouter.get('/cleanup',(req,res)=>{
+    User.find({}, (err, users)=>{
+        if (err) throw err;
+    }).cursor().on('data',(user)=>{
+        user.bills = [];
+        user.save();
+    }).on('end',()=>{
+        console.log('Rechnungen aufgeräumt.');
+        req.flash('success_msg','OK');
+        res.redirect('/');
+    });
 });
 
 

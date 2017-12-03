@@ -37,6 +37,36 @@ boardroutes.get('/members',isAdmin,(req,res)=>{
         req.flash('error_msg','Es ist ein Fehler aufgetreten.\n'+err);
         res.redirect('/board');
     });
+});
+
+boardroutes.get('/membership',isAdmin, (req, res)=>{
+    User.findOne(req.query).then((user)=>{
+        res.send({
+            username: user.username,
+            memberships: user.memberships
+        });
+    }, (err)=>{
+        if (err) throw err;
+    });
+});
+
+boardroutes.get('/editmembership',isAdmin, (req,res)=>{
+    var username = req.query.username;
+    var ende = req.query.membershipEnd;
+    if (!ende){
+        req.flash('error_msg','Es wurde kein Enddatum eingegeben!');
+        res.redirect('/board/members');
+    }
+
+    User.findOne({username: username}).then((user)=>{
+        var mem = user.memberships.filter((x)=>new Date(x.membershipEnd).getTime()===0);
+        console.log(mem);
+        req.flash('info_msg','Abwarten und Tee trinken.');
+        res.redirect('/board/members');
+    }).catch((e)=>{
+        req.flash('error_msg','Es ist ein Fehler aufgetreten!\n'+e);
+        res.redirect('/board/members');
+    });
 
 });
 
