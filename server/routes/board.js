@@ -1,5 +1,6 @@
 const express = require('express');
 const he = require('he');
+const moment = require('moment');
 
 const {User} = require('./../models/user');
 const {Break} = require('./../models/break');
@@ -43,7 +44,8 @@ boardroutes.get('/membership',isAdmin, (req, res)=>{
     User.findOne(req.query).then((user)=>{
         res.send({
             username: user.username,
-            memberships: user.memberships
+            memberships: user.memberships,
+            aktiv: user.aktiv
         });
     }, (err)=>{
         if (err) throw err;
@@ -53,15 +55,17 @@ boardroutes.get('/membership',isAdmin, (req, res)=>{
 boardroutes.get('/editmembership',isAdmin, (req,res)=>{
     var username = req.query.username;
     var ende = req.query.membershipEnd;
+    var art = req.query.membershipType;
     if (!ende){
         req.flash('error_msg','Es wurde kein Enddatum eingegeben!');
         res.redirect('/board/members');
     }
 
     User.findOne({username: username}).then((user)=>{
-        var mem = user.memberships.filter((x)=>new Date(x.membershipEnd).getTime()===0);
-        console.log(mem);
-        req.flash('info_msg','Abwarten und Tee trinken.');
+        var ind = user.memberships.findIndex((x)=>x.membershipType===art);
+        user.memberships[ind].membershipEnd=new Date(ende.getFullYear(),ende.getMonth()+1,0,12);
+        user.save();
+        req.flash('success_msg',`Enddatum ${moment(ende).format('DD.MM.YYYY')} abgespeichert.`);
         res.redirect('/board/members');
     }).catch((e)=>{
         req.flash('error_msg','Es ist ein Fehler aufgetreten!\n'+e);

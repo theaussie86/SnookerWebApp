@@ -13,6 +13,9 @@ $(function(){
             data: {username: username},
             success: function(data){
                 $('#memberModalLabel').text(data.username+"'s Mitgliedschaften");
+                if (!data.aktiv){
+                    $('.modal-footer').prepend('<button id="newmembership" type="button" class="btn btn-primary">Mitgliedschaft hinzufügen</button>');
+                }
                 data.memberships.forEach(function(item){
                     var ende;
                     var aktiv;
@@ -36,13 +39,15 @@ $(function(){
                     ende+'" '+aktiv+'>'+save+'<input name="username" type="text" value="'+
                     data.username+'" style="display: none;"></div></div></form><hr>';
                     $('#memberships').append(dataString);
+
+                    $('#newmembership').on('click',function () {
+                        var dataString = '<form action="/board/newmembership" class="form-group my-2"><div class="form-row"><div class="form-col-6"><label>Typ</label><input name="membershipType" type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" placeholder="Art"></div><div class="form-col-6"><label>Beitrag</label><input name="membershipFee" type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" placeholder="Beitrag eingeben"></div></div><div class="form-row"><div class="form-col-6"><label>Beginn</label><input name="membershipStart" type="date" class="form-control mb-2 mr-sm-2 mb-sm-0"></div><div class="form-col-6"><label>Ende</label><input type="date" name="membershipEnd" class="form-control mb-2 mr-sm-2 mb-sm-0">'+save+'<input name="username" type="text" value="'+
+                        data.username+'" style="display: none;"></div></div></form>';
+                        $('#memberships').append(dataString);
+                    });
+                
                 });
             }
         });
-    });
-
-    $('#enterende').on('click',function(){
-        alert('Hallo');
-        //$(this).type('date');
     });
 });
