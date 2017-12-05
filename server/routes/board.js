@@ -54,7 +54,7 @@ boardroutes.get('/membership',isAdmin, (req, res)=>{
 
 boardroutes.get('/editmembership',isAdmin, (req,res)=>{
     var username = req.query.username;
-    var ende = req.query.membershipEnd;
+    var ende = Date.parse(req.query.membershipEnd);
     var art = req.query.membershipType;
     if (!ende){
         req.flash('error_msg','Es wurde kein Enddatum eingegeben!');
@@ -62,10 +62,43 @@ boardroutes.get('/editmembership',isAdmin, (req,res)=>{
     }
 
     User.findOne({username: username}).then((user)=>{
+        ende = new Date(ende);
+        ende = new Date(ende.getFullYear(),ende.getMonth()+1,0,12);
         var ind = user.memberships.findIndex((x)=>x.membershipType===art);
-        user.memberships[ind].membershipEnd=new Date(ende.getFullYear(),ende.getMonth()+1,0,12);
+        user.memberships[ind].membershipEnd=ende;
         user.save();
         req.flash('success_msg',`Enddatum ${moment(ende).format('DD.MM.YYYY')} abgespeichert.`);
+        res.redirect('/board/members');
+    }).catch((e)=>{
+        req.flash('error_msg','Es ist ein Fehler aufgetreten!\n'+e);
+        res.redirect('/board/members');
+    });
+
+});
+
+boardroutes.get('/newmembership',isAdmin, (req,res)=>{
+    var username = req.query.username;
+    var start = Date.parse(req.query.membershipStart);
+    var art = req.query.membershipType;
+    var beitrag = 50;
+
+    if (art === 'rentner' || art === 'student') beitrag = 30;  
+
+    if (!start){
+        req.flash('error_msg','Es wurde kein Startdatum eingegeben!');
+        res.redirect('/board/members');
+    }
+
+    User.findOne({username: username}).then((user)=>{
+        start = new Date(start);
+        start = new Date(start.getFullYear(),start.getMonth(),1,12);
+        // user.memberships.push({
+        //     membershipType: art,
+        //     membershipFee: beitrag,
+        //     membershipStart: start
+        // });
+        // user.save();
+        req.flash('success_msg',`Neue Mitgliedschaft als ${art.replace(/(^[a-z])|(\s+[a-z])/g, txt => txt.toUpperCase())} für ${username} hinzugefügt. Die Mitgliedschaft beginnt ${moment(start).format('DD.MM.YYYY')}.`);
         res.redirect('/board/members');
     }).catch((e)=>{
         req.flash('error_msg','Es ist ein Fehler aufgetreten!\n'+e);

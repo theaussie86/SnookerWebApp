@@ -13,7 +13,7 @@ $(function(){
             data: {username: username},
             success: function(data){
                 $('#memberModalLabel').text(data.username+"'s Mitgliedschaften");
-                if (!data.aktiv){
+                if (!data.aktiv && $('#newmembership').length === 0){
                     $('.modal-footer').prepend('<button id="newmembership" type="button" class="btn btn-primary">Mitgliedschaft hinzufügen</button>');
                 }
                 data.memberships.forEach(function(item){
@@ -41,9 +41,11 @@ $(function(){
                     $('#memberships').append(dataString);
 
                     $('#newmembership').on('click',function () {
-                        var dataString = '<form action="/board/newmembership" class="form-group my-2"><div class="form-row"><div class="form-col-6"><label>Typ</label><input name="membershipType" type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" placeholder="Art"></div><div class="form-col-6"><label>Beitrag</label><input name="membershipFee" type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" placeholder="Beitrag eingeben"></div></div><div class="form-row"><div class="form-col-6"><label>Beginn</label><input name="membershipStart" type="date" class="form-control mb-2 mr-sm-2 mb-sm-0"></div><div class="form-col-6"><label>Ende</label><input type="date" name="membershipEnd" class="form-control mb-2 mr-sm-2 mb-sm-0">'+save+'<input name="username" type="text" value="'+
-                        data.username+'" style="display: none;"></div></div></form>';
-                        $('#memberships').append(dataString);
+                        if ($("form[action='/board/newmembership']").length === 0){
+                            var dataString = '<form action="/board/newmembership" class="form-group my-2"><div class="form-row align-items-bottom"><div class="col-4"><label>Typ</label><select name="membershipType" class="form-control mb-2 mr-sm-2 mb-sm-0"><option value="vollmitglied">Vollmitglied</option><option value="student">Student</option><option value="rentner">Rentner</option></select></div><div class="col-4"><label>Startdatum</label><input name="membershipStart" type="date" class="form-control mb-2 mr-sm-2 mb-sm-0" placeholder="Eintrittsdatum eingeben"></div><div class="col-4"><button type="submit" class="btn btn-primary mb-2 mr-sm-2 mb-sm-0 align-bottom">Absenden</button></div></div><input name="username" type="text" value="'+
+                            data.username+'" style="display: none;"></form>';
+                            $('#memberships').append(dataString);    
+                        }
                     });
                 
                 });

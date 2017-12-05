@@ -11,6 +11,16 @@
                 </div>
                 <div class="col-lg-9 col-md-8">
                     <div class="jumbotron" id="members-caption">
+                        {{#if user.isBoardMember}}
+                        <div class="row" id="headerrow">
+                            <div class="form-check">
+                            <label class="form-check-label">
+                                <input class="form-check-input" type="checkbox" value="">
+                                Alle Breaks verwalten
+                            </label>
+                            </div>                        
+                        </div>
+                        {{/if}}
                         {{> alerts}}
                         <div class="container">
                             <p>
@@ -49,6 +59,7 @@
         <!-- Optional JavaScript -->
         
         {{> scripts}}
+        <script type="text/javascript" src="/js/breaks.js"></script>
         <!-- Additional JavaScript -->
     </body>
 </html>
