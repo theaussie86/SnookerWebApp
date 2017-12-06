@@ -15,6 +15,8 @@ $(function(){
                 $('#memberModalLabel').text(data.username+"'s Mitgliedschaften");
                 if (!data.aktiv && $('#newmembership').length === 0){
                     $('.modal-footer').prepend('<button id="newmembership" type="button" class="btn btn-primary">Mitgliedschaft hinzufügen</button>');
+                } else if (data.aktiv && $('#newmembership').length !==0){
+                    $('#newmembership').remove();
                 }
                 data.memberships.forEach(function(item){
                     var ende;

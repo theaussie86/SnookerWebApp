@@ -16,6 +16,15 @@
                             <p>
                                 <h5>Mitgliederverwaltung</h5>
                             </p>
+                            <div class="row justify-content-around">
+                                <table>
+                                    <tbody>
+                                        <td class="table-primary rounded">Administrator</td>
+                                        <td></td>                                  
+                                        <td class="table-danger rounded">Inaktives Mitglied</td>                                
+                                    </tbody>
+                                </table>
+                            </div>
                             <table id="membersTable" class="table table-border table-light table-hover">
                             <thead>
                                 <tr>
@@ -26,7 +35,7 @@
                             </thead>
                             <tbody id="allMembers">
                                 {{#each members}}
-                                <tr data-toggle="modal" data-target="#memberModal"class="{{#if isBoardMember}} table-info{{/if}}{{#unless aktiv}} table-active{{/unless}} ">
+                                <tr data-toggle="modal" data-target="#memberModal"class="{{#if isBoardMember}} table-primary{{/if}}{{#unless aktiv}} table-danger{{/unless}} ">
                                     <td>{{username}}</td>
                                     <td>{{firstname}}</td>
                                     <td>{{lastname}}</td>

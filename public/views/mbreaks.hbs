@@ -13,18 +13,23 @@
                     <div class="jumbotron" id="members-caption">
                         {{#if user.isBoardMember}}
                         <div class="row" id="headerrow">
-                            <div class="form-check">
+                            <div class="col-4 form-check">
                             <label class="form-check-label">
-                                <input class="form-check-input" type="checkbox" value="">
+                                <input class="form-check-input" id="checkBreak" type="checkbox" value="">
                                 Alle Breaks verwalten
                             </label>
+                            </div>
+                            <div id="divCboPlayer" class="col-4 form-group" style="display: none">
+                            <select id="cboPlayer" class="custom-select d-block my-3">
+                                <option value="0">Spieler auswählen</option>
+                            </select>
                             </div>                        
                         </div>
                         {{/if}}
                         {{> alerts}}
                         <div class="container">
                             <p>
-                                <h5>Meine Breaks</h5>
+                                <h5 id="heading">Meine Breaks</h5>
                             </p>
                             <table class="table table-border table-light">
                             <thead>

@@ -92,12 +92,12 @@ boardroutes.get('/newmembership',isAdmin, (req,res)=>{
     User.findOne({username: username}).then((user)=>{
         start = new Date(start);
         start = new Date(start.getFullYear(),start.getMonth(),1,12);
-        // user.memberships.push({
-        //     membershipType: art,
-        //     membershipFee: beitrag,
-        //     membershipStart: start
-        // });
-        // user.save();
+        user.memberships.push({
+            membershipType: art.replace(/(^[a-z])|(\s+[a-z])/g, txt => txt.toUpperCase()),
+            membershipFee: beitrag,
+            membershipStart: start
+        });
+        user.save();
         req.flash('success_msg',`Neue Mitgliedschaft als ${art.replace(/(^[a-z])|(\s+[a-z])/g, txt => txt.toUpperCase())} für ${username} hinzugefügt. Die Mitgliedschaft beginnt ${moment(start).format('DD.MM.YYYY')}.`);
         res.redirect('/board/members');
     }).catch((e)=>{
@@ -110,14 +110,33 @@ boardroutes.get('/newmembership',isAdmin, (req,res)=>{
 // BREAKS
 boardroutes.get('/breaks',isAdmin,(req,res)=>{
     Break.find({}).sort({datum: -1}).then((breaks)=>{
-        res.render('bbreaks.hbs',{
-            title: 'Breakverwaltung',
-            user: req.user,
-            breaks: breaks
+        breaks = breaks.map((x)=>{
+            return {
+                player:x.player,
+                datum: x.datum,
+                break: x.break
+            };
         });
+        res.send(breaks);
     },(err)=>{
-        req.flash('error_msg','Es ist ein Fehler aufgetreten.\n'+err);
-        res.redirect('/board');
+        res.send({'error_msg':'Es ist ein Fehler aufgetreten.\n'+err});
+    });
+});
+
+boardroutes.get('/userbreaks',isAdmin,(req,res)=>{
+    var userId = req.user._id;
+    Break.find({_member: userId}).then((breaks)=>{
+        if (breaks.length===0) res.send({info: 'Von dir gibt es noch keine Breaks in der Datenbank'});
+        breaks = breaks.map((x)=>{
+            return {
+                player:x.player,
+                datum: x.datum,
+                break: x.break
+            };
+        });
+        res.send(breaks);
+    },(err)=>{
+            res.send({'error_msg':'Es ist ein Fehler aufgetreten.\n'+err});
     });
 });
 
@@ -131,61 +150,11 @@ boardroutes.get('/deletebreak/:datum/:player/:break',isAdmin,(req,res)=>{
         break: req.params.break
     },(err, serie)=>{ 
         if(err){
-            return req.flash({'error_msg':`Es ist ein Fehler aufgetreten. ${err}.`});
+            req.flash({'error_msg':`Es ist ein Fehler aufgetreten. ${err}.`});
+            res.send();
         }
         req.flash('success_msg',`Break ${serie.break} von ${serie.player} wurde gelöscht.`)
         res.send(serie);
-    });
-});
-
-boardroutes.get('/editbreak/:datum/:player/:break',isAdmin,(req,res)=>{
-    var dateParts = req.params.datum.split('.');
-    var dat = new Date(dateParts[2],dateParts[1]-1,dateParts[0],12);
-    var player = he.decode(req.params.player);
-    Break.findOne({
-        datum: dat,
-        player: player,
-        break: req.params.break
-    },(err, serie)=>{ 
-        if(err) throw err;
-        res.send(serie);
-    });
-});
-
-boardroutes.post('/editbreak',isAdmin,(req,res)=>{
-    var body = req.body;
-    var dateParts = body.datum.split('.');
-    var dat = new Date(dateParts[2],dateParts[1]-1,dateParts[0],12);
-    var player = he.decode(body.player);
-    var info = "Keine Änderungen!";  
-    Break.findOne({
-        datum: dat,
-        player: player,
-        break: body.break
-    }).then(async (serie)=>{ 
-        var info="";
-        if(body.player) {
-            // serie.player = body.player;              
-            info=info+`Spieler in ${body.player} geändert.\n`;
-        }
-
-        if(body.Datum) {
-            // serie.datum = body.datum;                
-            info=info+`Datum auf den ${body.datum} geändert.\n`;
-        }
-
-        if(body.break) {
-            // user.street = body.strasse;                
-            info=info+`Break in ${body.break} geändert.\n`;
-        }
-        if(info === "") info= "Keine Änderungen!"
-        // user.save().then((serie)=>{
-            res.send({'success_msg':info});
-            // res.redirect('/board/breaks');
-        // });
-    }).catch((e)=>{
-        req.flash('error_msg','Fehler! '+e);
-        res.redirect('/board/breaks');    
     });
 });
 
@@ -202,6 +171,51 @@ boardroutes.get('/bills',isAdmin,(req,res)=>{
     res.render('bbills.hbs',{
         title: 'Rechnungsverwaltung',
         user: req.user
+    });
+});
+
+boardroutes.get('/sendbills',isAdmin,(req,res)=>{
+    var vdate = new Date();
+    vdate = new Date(vdate.getFullYear(),vdate.getMonth(),0,12);
+    User.find({}, (err,users)=>{
+        if (err) throw err;        
+    }).cursor().on('data',(user)=>{
+        var start = user.bills[user.bills.length-1].billDate;
+        while (start<vdate){
+            start = new Date(start.getFullYear(),start.getMonth()+2,0,12);
+            console.log(start);
+            user.memberships.forEach((element) => {
+                if (element.membershipStart<start &&(start<=element.membershipEnd || element.membershipEnd.getTime()===0)) {
+                    var beitrag = element.membershipFee;
+                    if (start.getTime()===element.membershipEnd.getTime()) beitrag=0;
+                    Rent.find({
+                        _member: user._id,
+                        datum:{$gte: new Date(start.getFullYear(),start.getMonth(),1,12), $lte: new Date(start.getFullYear(),start.getMonth()+1,0,12)}        
+                    }).then((rents)=>{
+                        var sales = rents.reduce((sum, rent)=>{
+                            var guests=1;
+                            if (rent.onlyGuests) guests = 2;
+                            return sum + (Math.ceil(3.5*(rent.ende-rent.start)/360000)*guests/10);
+                        },0);
+                        var paid = false;
+                        if (sales===0) paid= true;
+                        user.bills.push({
+                            billDate: start,
+                            membershipFee: beitrag,
+                            visitorsSales: sales,
+                            salesPaid: paid
+                        });
+                        user.save();
+                    }).catch((e)=>{
+                        throw e;
+                    });
+                }
+            });
+        }
+    }).on('end',()=>{
+        console.log('Alle Rechnungen erstellt.');
+        req.flash('success_msg','Alle Rechnungen erstellt');
+        res.redirect('/members');
     });
 });
 

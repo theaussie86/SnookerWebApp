@@ -11,7 +11,10 @@ const membershipSchema = new mongoose.Schema({
         type : Date,
         default : Date.now
     },
-    membershipEnd: Date
+    membershipEnd: {
+        type: Date,
+        default: 0
+    }
 });
 
 const billSchema = new mongoose.Schema({

@@ -1,10 +1,52 @@
 $(function(){
-    $('.deleteBreak').on('click',function(){
+    $('#checkBreak').on('change',function(){
+        if ($('#checkBreak').is(':checked')) {
+            $('#heading').text('Alle Breaks');
+            $.ajax({
+                type: 'GET',
+                url: '/board/breaks',
+                success: function(breaks){
+                    $('#myBreaks').empty();
+                    breaks.forEach((b,i) => {
+                        $('#myBreaks').append('<tr><th>'+(i+1)+'.'+'</th><td>'+
+                        moment(b.datum).format('DD.MM.YYYY')+'</td><td>'+
+                        b.player+'</td><td>'+
+                        b.break+
+                        '</td><td><button role="button" class="btn btn-primary deleteBreak">Löschen</button></td></tr>')
+                    });
+                }
+            });
+        } else {
+            $('#heading').text('Meine Breaks');
+            $.ajax({
+                type: 'GET',
+                url: '/board/userbreaks',
+                success: function(data){
+                    $('#myBreaks').empty();
+                    if (data.info) {
+                        if ($('div.alert-warning').length === 0){
+                            $('.container').before('<div class="alert small alert-warning alert-dismissable "><a href="#" class="close" data-dismiss="alert" aria-label="close" title="close">×</a>'+
+                            data.info+'</div>');
+                        }
+                    } else {
+                        data.forEach((b,i) => {
+                            $('#myBreaks').append('<tr><th>'+(i+1)+'.'+'</th><td>'+
+                            moment(b.datum).format('DD.MM.YYYY')+'</td><td>'+
+                            b.player+'</td><td>'+
+                            b.break+'</tr>');
+                        });
+                    }
+                }
+            });
+        }
+    });
+
+    $(document).on('click','.deleteBreak', function(){
         var $row = $(this).closest('tr').children();
         
-        var datum= $row[0].textContent;
-        var player= $row[1].textContent;
-        var serie= $row[2].textContent;
+        var datum= $row[1].textContent;
+        var player= $row[2].textContent;
+        var serie= $row[3].textContent;
 
         $.ajax({
             type: 'GET',
@@ -13,35 +55,5 @@ $(function(){
                 location.reload();
             }
         });
-    });
-
-    $('.editBreak').on('click',function(){
-        var $row = $(this).closest('tr').children();
-        
-        var datum= $row[0].textContent;
-        var player= $row[1].textContent;
-        var serie= $row[2].textContent;
-
-        $.ajax({
-            type: 'GET',
-            url: '/board/editbreak/'+datum+'/'+player+'/'+serie,
-            success: function(serie){
-                $('#breakdatum').attr('placeholder',moment(serie.datum).format('DD.MM.YYYY'));
-                $('#player').attr('placeholder',serie.player);
-                $('#break').attr('placeholder',serie.break);
-            }
-        });
-    });
-
-    $('#change').on('click', function() {
-        var prev = $('.change'),
-            ro   = prev.prop('disabled', function(i, v) { return !v; });
-        $(this).text(function(i, text){
-            return text === 'Ändern' ? 'Speichern' : 'Ändern';
-        });
-        console.log($(this).text());
-        if ($(this).text()==='Ändern'){
-            $('#editbreakform').submit();
-        }
     });
 });
