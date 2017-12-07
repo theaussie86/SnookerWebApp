@@ -174,7 +174,7 @@ boardroutes.get('/bills',isAdmin,(req,res)=>{
     });
 });
 
-boardroutes.get('/sendbills',isAdmin,(req,res)=>{
+boardroutes.get('/makebills',isAdmin,(req,res)=>{
     var vdate = new Date();
     vdate = new Date(vdate.getFullYear(),vdate.getMonth(),0,12);
     User.find({}, (err,users)=>{
@@ -214,9 +214,13 @@ boardroutes.get('/sendbills',isAdmin,(req,res)=>{
         }
     }).on('end',()=>{
         console.log('Alle Rechnungen erstellt.');
-        req.flash('success_msg','Alle Rechnungen erstellt');
+        req.flash('success_msg','Alle Rechnungen erstellt.')
         res.redirect('/members');
     });
+});
+
+boardroutes.get('/sendbills',isAdmin,(req,res)=>{
+    
 });
 
 // REGISTER
