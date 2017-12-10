@@ -168,9 +168,39 @@ boardroutes.get('/visitors',isAdmin,(req,res)=>{
 
 // BILLS
 boardroutes.get('/bills',isAdmin,(req,res)=>{
-    res.render('bbills.hbs',{
-        title: 'Rechnungsverwaltung',
-        user: req.user
+
+    User.aggregate([{$unwind: "$bills"},{
+        $project:{
+            _id: false,
+            username: true,
+            bills: true
+        }
+    }]).then((bills)=>{
+        return bills.map((x)=>{
+            return {
+                username: x.username,
+                billDate: x.bills.billDate,
+                membershipFee: x.bills.membershipFee,
+                visitorsSales: x.bills.visitorsSales,
+                sent: x.bills.sent,
+                salesPaid: x.bills.salesPaid,
+                feePaid: x.bills.feePaid
+            }
+        }).sort((a,b,)=>b.billDate-a.billDate);
+    }).then((bills)=>{
+        var names = bills.reduce((a,b)=>{
+            if(a.indexOf(b.username)<0) a.push(b.username);
+            return a;
+        },[]);
+        res.render('bbills.hbs',{
+            title: 'Rechnungsverwaltung',
+            user: req.user,
+            names: names,
+            bills: bills
+        });
+    }).catch((e)=>{
+        req.flash('error_msg',`Es ist ein Fehler aufgetreten. ${e}.`);
+        res.redirect('/members');
     });
 });
 
@@ -216,6 +246,75 @@ boardroutes.get('/makebills',isAdmin,(req,res)=>{
         console.log('Alle Rechnungen erstellt.');
         req.flash('success_msg','Alle Rechnungen erstellt.')
         res.redirect('/members');
+    });
+});
+
+boardroutes.get('/filterbills',isAdmin,(req,res)=>{
+    console.log(req.query);
+    User.aggregate([{$unwind: "$bills"},{
+        $project:{
+            _id: false,
+            username: true,
+            bills: true
+        }
+    }]).then((bills)=>{
+        if (req.query.member !=0) {
+            bills = bills.reduce((a,b)=>{
+                if(b.username===req.query.member) a.push(b);
+                return a;
+            },[]);
+        }        
+        bills =bills.map((x)=>{
+            return {
+                username: x.username,
+                billDate: x.bills.billDate,
+                membershipFee: x.bills.membershipFee,
+                visitorsSales: x.bills.visitorsSales,
+                sent: x.bills.sent,
+                salesPaid: x.bills.salesPaid,
+                feePaid: x.bills.feePaid
+            }
+        });
+        if (req.query.year !=0 && req.query.month !=0){
+            bills = bills.reduce((a,b)=>{
+                if(b.billDate.getMonth()===req.query.month-1 && b.billDate.getFullYear()===Number(req.query.year)) a.push(b);
+                return a;
+            },[]);
+        } else if (req.query.year !=0 && req.query.month ==0){
+            bills = bills.reduce((a,b)=>{
+                if(b.billDate.getFullYear()===Number(req.query.year)) a.push(b);
+                return a;
+            },[]);
+        }   else if (req.query.year ==0 && req.query.month !=0){
+            bills = bills.reduce((a,b)=>{
+                if(b.billDate.getMonth()===req.query.month-1) a.push(b);
+                return a;
+            },[]);
+        }
+        bills = bills.sort((a,b,)=>b.billDate-a.billDate);
+
+        res.send({
+            message:`Rechnungen gefiltert. ${bills.length} Treffer gefunden.`,
+            bills: bills
+        });
+
+    }).catch((e)=>{
+        res.send({message:`Es ist ein Fehler aufgetreten.\n ${e}`});
+    });
+
+});
+
+boardroutes.get('/singlebill',isAdmin, (req,res)=>{
+    const username = req.query.username;
+    console.log(req.query.username, id);
+    var datum =new Date(Number(req.query.datum));
+    User.find({
+        username: username
+    }).then((user)=>{
+        var bill = user.bills.filter((x)=> x.billDate.getTime()===datum.getTime());
+        res.send(bill);
+    }).catch((e)=>{
+        res.send(e);
     });
 });
 

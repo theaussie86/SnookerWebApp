@@ -27,8 +27,9 @@
 <div class="btn-group-vertical d-block" role="group" aria-label="Button group with nested dropdown">
     <a href="/data/entervisitor"><button type="button" class="btn btn-secondary">Gäste abrechnen</button></a>
     <a href="/data/enterbreak"><button type="button" class="btn btn-secondary">Breaks eintragen</button></a>
-    {{#if user.isBoardMember}}
+    {{#if bills}}
     <a href="/board/makebills"><button type="button" class="btn btn-secondary">Rechnungen erstellen</button></a>
+    <a href="/board/makebills"><button type="button" class="btn btn-secondary">Rechnungen machen</button></a>
     <a href="/board/sendbills"><button type="button" class="btn btn-secondary">Rechnungen verschicken</button></a>
     {{/if}}
 </div>
