@@ -82,7 +82,7 @@ memberroutes.get('/lastmonths',(req,res)=>{
             year:{$year:"$datum"},
             month:{$month: "$datum"},
             betrag:{
-                $multiply:[{$divide:[{$ceil:{$multiply:[{$divide:[{$subtract: ["$ende","$start"]},360000]},3.5]}},10]},
+                $multiply:[{$multiply:[{$ceil:{$multiply:[{$divide:[{$subtract: ["$ende","$start"]},360000]},3.5]}},10]},
                 {$cond:[{$eq:["$onlyGuests", true]},2,1]}]
             }                
         }
@@ -164,14 +164,14 @@ memberroutes.get('/visitors',isLoggedIn,(req,res)=>{
         var umsatz = docs.reduce((a,b)=>{
             var guests = 1;
             if (b.onlyGuests) guests = 2;
-            return a + (Math.ceil((b.ende-b.start)*3.5/360000)*guests/10);
+            return a + (Math.ceil((b.ende-b.start)*3.5/360000)*guests*10);
         },0);
 
         res.render('mvisitors.hbs',{
             title: 'Meine Gäste',
             user: req.user,
             rents: rents,
-            umsatz: umsatz
+            umsatz: umsatz/100
         });
     },(err)=>{
         req.flash('error_msg','Es ist ein Fehler aufgetreten.\n'+err);
@@ -179,28 +179,28 @@ memberroutes.get('/visitors',isLoggedIn,(req,res)=>{
     });
 });
 
-memberroutes.get('/visitors/get/:monat/:jahr',isLoggedIn,(req,res)=>{
+memberroutes.get('/visitors/get',isLoggedIn,(req,res)=>{
     var userId = req.user._id;
     var start;
     var end;
-    if (req.params.monat!=0 && req.params.jahr!=0){
-        start= new Date(req.params.jahr,req.params.monat-1,1);
-        end= new Date(req.params.jahr,req.params.monat,0);
-    } else if(req.params.monat != 0 && req.params.jahr==0){
-        start= new Date(new Date().getFullYear(),req.params.monat-1,1);
-        end= new Date(new Date().getFullYear(),req.params.monat,0);
-    } else if(req.params.monat == 0 && req.params.jahr!=0){
-        start= new Date(req.params.jahr,0,1);
-        end= new Date(req.params.jahr,11,31);
+    if (req.query.monat!=0 && req.query.jahr!=0){
+        start= new Date(req.query.jahr,req.query.monat-1,1,12);
+        end= new Date(req.query.jahr,req.query.monat,0,12);
+    } else if(req.params.monat != 0 && req.query.jahr==0){
+        start= new Date(new Date().getFullYear(),req.query.monat-1,1,12);
+        end= new Date(new Date().getFullYear(),req.query.monat,0,12);
+    } else if(req.query.monat == 0 && req.query.jahr!=0){
+        start= new Date(req.query.jahr,0,1,12);
+        end= new Date(req.query.jahr,11,31,12);
     } else {
-        start= new Date(2015,0,1);
+        start= new Date(2015,0,1,12);
         end= new Date();
     }
-    
-    Rent.aggregate({$match:{
+
+    Rent.find({
         _member: userId,
         datum:{$gte: start, $lte: end}
-    }},{$sort:{datum:-1}}).then((docs)=>{
+    }).sort({datum:-1}).then((docs)=>{
         if (docs.length === 0){
             req.send('info_msg','Keine Gastumsätze gefunden.');
         }
@@ -223,7 +223,10 @@ memberroutes.get('/visitors/get/:monat/:jahr',isLoggedIn,(req,res)=>{
                 betrag: Math.ceil((x.ende-x.start)*3.5/360000)*guests/10
             }
         });
-        res.send(rents);
+        res.send({
+            username: req.user.username,
+            rents: rents
+        });
     },(err)=>{
         res.send({err: err});
     });

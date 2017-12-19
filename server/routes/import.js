@@ -124,9 +124,9 @@ importRouter.get('/bills',(req,res)=>{
                 var sales = rents.reduce((sum, rent)=>{
                         var guests=1;
                         if (rent.onlyGuests) guests = 2;
-                        return sum + (Math.ceil(3.5*(rent.ende-rent.start)/360000)*guests/10);
+                        return sum + (Math.ceil(3.5*(rent.ende-rent.start)/360000)*guests*10);
                     },0);
-                    user.bills[i].visitorsSales= sales;
+                    user.bills[i].visitorsSales= sales/100;
                     
                     user.save();
             }); 

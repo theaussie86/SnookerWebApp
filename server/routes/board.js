@@ -196,11 +196,20 @@ boardroutes.get('/bills',isAdmin,(req,res)=>{
             title: 'Rechnungsverwaltung',
             user: req.user,
             names: names,
-            bills: bills
+            bills: bills,
+            board: true
         });
     }).catch((e)=>{
         req.flash('error_msg',`Es ist ein Fehler aufgetreten. ${e}.`);
         res.redirect('/members');
+    });
+});
+
+boardroutes.get('/downloadbills',isAdmin,(req,res)=>{
+    res.render('downloadbills.hbs',{
+        title: 'Rechnungen herunterladen',
+        user: req.user,
+        'info_msg':'Wähle Monat und Jahr aus!'
     });
 });
 
@@ -225,14 +234,14 @@ boardroutes.get('/makebills',isAdmin,(req,res)=>{
                         var sales = rents.reduce((sum, rent)=>{
                             var guests=1;
                             if (rent.onlyGuests) guests = 2;
-                            return sum + (Math.ceil(3.5*(rent.ende-rent.start)/360000)*guests/10);
+                            return sum + (Math.ceil(3.5*(rent.ende-rent.start)/360000)*guests*10);
                         },0);
                         var paid = false;
                         if (sales===0) paid= true;
                         user.bills.push({
                             billDate: start,
                             membershipFee: beitrag,
-                            visitorsSales: sales,
+                            visitorsSales: sales/100,
                             salesPaid: paid
                         });
                         user.save();
@@ -306,17 +315,44 @@ boardroutes.get('/filterbills',isAdmin,(req,res)=>{
 
 boardroutes.get('/singlebill',isAdmin, (req,res)=>{
     const username = req.query.username;
-    console.log(req.query.username, id);
-    var datum =new Date(Number(req.query.datum));
-    User.find({
+    var datum =req.query.datum;
+    User.findOne({
         username: username
     }).then((user)=>{
-        var bill = user.bills.filter((x)=> x.billDate.getTime()===datum.getTime());
+        var bill = user.bills.filter((x)=> {
+            return x.billDate.getTime()===Number(datum);
+        }).map((x)=>{
+            return {
+                salesPaid: x.salesPaid,
+                feePaid: x.feePaid
+            }
+        });
         res.send(bill);
     }).catch((e)=>{
         res.send(e);
     });
 });
+
+boardroutes.get('/editbill',isAdmin, (req,res)=>{
+    const username = req.query.username;
+    const datum =req.query.datum;
+    User.findOne({
+        username: username
+    }).then((user)=>{
+        var index= user.bills.findIndex((e)=> {
+            return e.billDate.getTime()===Number(datum);
+        });
+        user.bills[index].salesPaid=req.query.salesPaid;
+        user.bills[index].feePaid=req.query.feePaid;
+        user.save();
+        res.send({
+            'success_msg':`Rechnung von ${moment(Number(datum)).format('MMMM YYYY')} von ${username} geändert.`
+        });
+    }).catch((e)=>{
+        res.send({'error_msg':`Es ist ein Fehler aufgetreten. ${e}.`});
+    });
+});
+
 
 boardroutes.get('/sendbills',isAdmin,(req,res)=>{
     

@@ -14,62 +14,64 @@ $(function(){
         var datum = $tds[0].textContent.split(' ');
         var monat = moment().month(datum[0]).format('M');
         var Jahr = Number(datum[1]);
-        datum = new Date(Jahr,monat,1,12).getTime();
+        datum = new Date(Jahr,monat,0,12).getTime();
         var gast = $tds[2].textContent.trim();
         var beitrag = $tds[3].textContent.trim();
         var username = $tds[1].textContent.trim();
         // console.log(datum+', '+gast+', '+beitrag);
-        $('#billModalLabel').text('Rechnung '+$tds[0].textContent);
+        $('#billModalLabel').text('Rechnung '+$tds[0].textContent+' von '+username);
         $('#lblBeitrag').text('Beitrag '+moment().month(monat).format('MMMM')+':');
         $('#beitrag').text(beitrag);
+        $('#lblvisitors').text('Gastumsatz '+moment().month(monat-1).format('MMMM')+':');
+        $('#visitors').text(gast);
+        $('#editBill').prop('disabled',true);
         $('#tblumsatz').empty();        
         $.ajax({
             type: 'GET',
-            url: '/board/singlebill/',
+            url: '/board/singlebill',
             data:{
                 username: username,
                 datum: datum
             },
-            success: function(bill){
-                var output= rents.map((rent)=>{
-                    var onlyguest=1;
-                    var pl;
-                    if (rent.onlyGuests) {
-                        pl= rent.player1+' und '+rent.player2;
-                        onlyguest = 2;
-                    } else if(rent.player1 === username[1]){
-                        pl= rent.player2;
-                    } else {
-                        pl= rent.player1;
-                    }
-                    return {
-                        d:moment(rent.datum).format('DD.MM.YYYY'), 
-                        p1:pl, 
-                        t: moment(rent.ende).diff(rent.start)/3600000,
-                        p: Math.ceil(moment(rent.ende).diff(rent.start)*3.5/360000)*onlyguest/10
-                    };
-                }).sort(function(a, b) {
-                    return parseFloat(b.d) - parseFloat(a.d);
-                });
-
-                if (output.length === 0){
-                    $('#umsatz').empty();
-                    $('#lblsumme').empty();      
-                    $('#summe').empty();                                        
-                    $('#umsatz').text('Du hast letzten Monat nicht mit Gästen gespielt.'); 
-                }else{
-                    $('#lblsumme').text('Summe:');
-                    $('#umsatz').empty();
-                    $('#umsatz').append('Umsatz Gäste Vormonat:<table id="tblumsatz" class="table"></table>');                    
-                    $.each(output,function(i, x){
-                        $('#tblumsatz').append('<tr><td>'+x.d+'</td><td>'+x.p1+'</td><td>'+x.t.toFixed(1).replace('.',',')+' h'+'</td><td>'+x.p.toFixed(2).replace('.',',')+' €'+'</td></tr>');                    
-                    });
-                    $('#summe').text(gast); 
-                }
-
+            success: function(data){
+                if (data[0].salesPaid) $('#salesPaid').prop('checked', true);
+                if (data[0].feePaid) $('#feePaid').prop('checked', true);
             }
         });
 
+    });
+
+    $('#editBill').on('click',function(){
+        var salesPaid = $('#salesPaid').prop('checked');
+        var feePaid = $('#feePaid').prop('checked');
+        var header = $('#billModalLabel').text().split(' ');
+        var username = header[4];
+        var monat = moment().month(header[1]).format('M');
+        var jahr = Number(header[2]);
+        var billDate= new Date(jahr,monat,0,12).getTime();
+        $.ajax({
+            method: 'GET',
+            url: '/board/editbill',
+            data:{
+                username: username,
+                datum: billDate,
+                salesPaid: salesPaid,
+                feePaid: feePaid
+            },
+            success: function(data){
+                $('.alert-success').remove();
+                $('#filter').after('<div class="alert small alert-success alert-dismissable "><a href="#" class="close" data-dismiss="alert" aria-label="close" title="close">×</a>'+
+                data.success_msg+'</div>');
+            }
+        });
+    });
+
+    $('#salesPaid').on('change',function(){
+        enable();
+    });
+
+    $('#feePaid').on('change',function(){
+        enable();
     });
 
     $('#cbomonth').on('change',function(){
@@ -84,12 +86,15 @@ $(function(){
         filter();
     });
 
+    var enable = function(){
+        $('#editBill').prop('disabled',false);
+    };
+
     var filter = function(){
         var monat= $('#cbomonth').val();
         var jahr= $('#cboyear').val();
         var member= $('#cbomembers').val();
 
-        console.log(monat, jahr, member);
         $('#allBills').empty();
         if($('div.alert').length>0) $('div.alert').remove();
         

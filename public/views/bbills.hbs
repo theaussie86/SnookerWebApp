@@ -11,7 +11,7 @@
                 </div>
                 <div class="col-lg-9 col-md-8">
                     <div class="jumbotron" id="board-caption">
-                        <div class="row justify-content-around">
+                        <div id= "filter" class="row justify-content-around">
                             <div class="col-3">
                             <select id="cbomonth" class="custom-select d-block my-3">
                                 <option value="0">Monat auswählen</option>
@@ -82,8 +82,8 @@
                 <div class="container-fluid">
 
                     <div class="row my-2">
-                        <div id="lblsumme" class="col-md-4 font-weight-bold">Gastumsatz:</div>
-                        <div id="summe" class="col-md-4 ml-auto font-weight-bold"></div>
+                        <div id="lblvisitors" class="col-md-4 font-weight-bold">Gastumsatz:</div>
+                        <div id="visitors" class="col-md-4 ml-auto font-weight-bold"></div>
                         <div class="col-md-4"><input type="checkbox" name="salesPaid" id="salesPaid">Gastumsatz bezahlt</div>
                     </div>
                     <div class="row align-items-end">
@@ -94,7 +94,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button id="editBill" type="button" class="btn btn-primary">Speichern</button>
+                <button id="editBill" type="button" class="btn btn-primary" data-dismiss="modal">Speichern</button>
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Schließen</button>
             </div>
             </div>
