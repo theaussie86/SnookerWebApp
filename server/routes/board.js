@@ -1,5 +1,5 @@
 const express = require('express');
-const he = require('he');
+const _ = require('lodash');
 const moment = require('moment');
 
 const {User} = require('./../models/user');
@@ -202,6 +202,32 @@ boardroutes.get('/bills',isAdmin,(req,res)=>{
     }).catch((e)=>{
         req.flash('error_msg',`Es ist ein Fehler aufgetreten. ${e}.`);
         res.redirect('/members');
+    });
+});
+
+boardroutes.get('/test',isAdmin,(req,res)=>{
+    var datum= new Date(req.query.jahr,req.query.monat,0,12);
+    var bDate= new Date(req.query.jahr,req.query.monat,1,12);
+    var start = new Date(datum.getFullYear(),datum.getMonth(),1,12);
+    var end = new Date(datum.getFullYear(),datum.getMonth()+1,0,12);
+    User.findOne({username: req.query.username}).then((user)=>{
+        var beitrag = user.memberships.find((x)=>{
+            return (x.membershipStart<bDate && x.membershipEnd>bDate) || (x.membershipEnd.getTime()===0);
+        });
+        console.log(beitrag);
+        user= _.pick(user,['_id','firstname','lastname','street','zip','city','mitID']);
+        user.beitrag = beitrag.membershipFee;
+        Rent.find({
+            _member: user._id,
+            datum:{$gte: start,$lte: end}
+        }).then((rents)=>{
+            res.send({
+                user: user,
+                rents: rents
+            });
+        });
+    }).catch((e)=>{
+        res.send({'error_msg':'Fehler! '+e});
     });
 });
 

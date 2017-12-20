@@ -8,27 +8,34 @@
     <div id="stage">
         <div class="container-fluid" id="stage-caption">
             <div id="formContainer" class="container-fluid p-2 rounded col-10 col-md-6">
-                <form id="breakform" method="POST"> 
+                <form id="downloadForm"> 
                     <div class="form-group">
                         <h4>Break eintragen</h4>
                         <hr>
                         {{> alerts}}
-                        <label for="datum" class="form-control-label float-left text-secondary">Datum:</label>
-                        <input type="date" value="today" class="form-control" name="datum" id="datum" required autofocus></input>
-                        <label for="spieler" class="form-control-label float-left text-secondary">Spielername:</label>
-                        <input type="text" class="form-control" name="player" id="spieler" placeholder="{{user.username}}" required readonly>
-                        <div class="form-row">
-                            <div class="form-check">
-                            <label for="member" class="form-check-label float-left text-secondary">
-                                <input type="checkbox" class="form-check-input" value="noMember" name="member" id="member">
-                                Ich habe das Break nicht gespielt!
-                            </label>
-                            </div>
-                        </div>
-                        <label for="break" class="form-control-label float-left text-secondary">Höhe des Breaks:</label>
-                        <input type="number" class="form-control" name="break" min="1" max="155" id="break" placeholder="Wie hoch war das Break?" required>
+                        <label for="datum" class="form-control-label float-left text-secondary">Monat:</label>
+                        <select class="form-control" name="month" id="cbomonth"autofocus>
+                            <option value="0">Wähle einen Monat aus</option>
+                            <option value="1">Januar</option>
+                            <option value="2">Februar</option>
+                            <option value="3">März</option>
+                            <option value="4">April</option>
+                            <option value="5">Mai</option>
+                            <option value="6">Juni</option>
+                            <option value="7">Juli</option>
+                            <option value="8">August</option>
+                            <option value="9">September</option>
+                            <option value="10">Oktober</option>
+                            <option value="11">November</option>
+                            <option value="12">Dezember</option>
+                        </select>
+                        <label for="spieler" class="form-control-label float-left text-secondary">Jahr:</label>
+                        <select class="form-control" name="year" id="cboyear">
+                            <option value="0">Wähle ein Jahr aus</option>
+                        </select>
                         <hr>
-                        <button type="submit" class="btn btn-success">Speichern</button>
+                        <button class="btn btn-success">Speichern</button>
+                        <button id="test" class="btn btn-success">Test</button>
                     </div>
                 </form> 
             </div>
@@ -38,6 +45,6 @@
     {{> footer}}
     {{> scripts}}
         <!-- Optional JavaScript -->
-        <script type="text/javascript" src="/js/enterbreaks.js"></script>
+        <script type="text/javascript" src="/js/download.js"></script>
     </body>
 </html>
