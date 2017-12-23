@@ -205,29 +205,69 @@ boardroutes.get('/bills',isAdmin,(req,res)=>{
     });
 });
 
-boardroutes.get('/test',isAdmin,(req,res)=>{
+boardroutes.get('/download',isAdmin,(req,res)=>{
     var datum= new Date(req.query.jahr,req.query.monat,0,12);
-    var bDate= new Date(req.query.jahr,req.query.monat,1,12);
+    var bDate= new Date(req.query.jahr,Number(req.query.monat)+1,0,12);
     var start = new Date(datum.getFullYear(),datum.getMonth(),1,12);
     var end = new Date(datum.getFullYear(),datum.getMonth()+1,0,12);
-    User.findOne({username: req.query.username}).then((user)=>{
-        var beitrag = user.memberships.find((x)=>{
-            return (x.membershipStart<bDate && x.membershipEnd>bDate) || (x.membershipEnd.getTime()===0);
-        });
-        console.log(beitrag);
-        user= _.pick(user,['_id','firstname','lastname','street','zip','city','mitID']);
-        user.beitrag = beitrag.membershipFee;
-        Rent.find({
-            _member: user._id,
-            datum:{$gte: start,$lte: end}
-        }).then((rents)=>{
-            res.send({
-                user: user,
-                rents: rents
+    var data=[];
+    User.find({}).then((users)=>{
+        users = users.filter((x)=>{
+            return x.memberships.findIndex((x)=>{
+                return (x.membershipStart<=datum && x.membershipEnd.getTime()===0) || (x.membershipStart<datum && x.membershipEnd>=datum)
+            }) != -1;
+        }).forEach((user,i, arr)=>{
+            var uname= user.username;
+            var beitrag = user.memberships.find((x)=>{
+                return (x.membershipStart<= bDate && x.membershipEnd>= bDate) || (x.membershipStart<=bDate && x.membershipEnd.getTime()===0);
             });
-        });
+            user= _.pick(user,['_id','firstname','lastname','street','zip','city']);
+            user.billNr = `${req.query.jahr}-${req.query.monat}-${uname}`;
+            user.zeitraum= moment(datum).format('MMMM YYYY');
+            user.dueDate = moment(bDate).format('DD.MM.YYYY');
+            if(!beitrag){
+                user.beitrag = 0;
+            } else {
+                user.beitrag = beitrag.membershipFee;
+            }
+            Rent.find({
+                _member: user._id,
+                datum:{$gte: start,$lte: end}
+            }).then((rents)=>{
+                if (!rents){
+                    user.summe = 0;
+                } else {
+                    rents = rents.map((x)=>{
+                        var pl;
+                        var guests=1;
+                        if (x.onlyGuests) {
+                            pl= `${x.player1} und ${x.player2}`
+                            guests = 2;
+                        } else if(x.player1 === uname) {
+                            pl = x.player2;
+                        } else{
+                            pl= x.player1;
+                        }
+                        return{
+                            datum: x.datum,
+                            player: pl,
+                            time: Math.ceil((x.ende-x.start)/360000)/10,
+                            betrag: Math.ceil(3.5*(x.ende-x.start)/360000)*guests/10
+                        }
+                    });
+                    user.summe = rents.reduce((sum,rent)=>{
+                        return sum + rent.betrag*100;
+                    },0)/100;
+                }
+                data.push({
+                    user: user,
+                    rents: rents
+                });
+                if (data.length === arr.length) res.send(data);
+            });
+        });        
     }).catch((e)=>{
-        res.send({'error_msg':'Fehler! '+e});
+        res.send(e);
     });
 });
 

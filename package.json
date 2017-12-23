@@ -41,6 +41,7 @@
     "nodemailer": "^4.3.1",
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
+    "pdfmake": "^0.1.35",
     "popper.js": "^1.12.5",
     "validator": "^8.2.0"
   },

@@ -1,5 +1,8 @@
 const express = require('express');
 const _ = require('lodash');
+const moment = require('moment');
+
+moment.locale('de');
 
 const {User} = require('./../models/user');
 const {Break} = require('./../models/break');
@@ -253,8 +256,59 @@ memberroutes.get('/bills',isLoggedIn,(req,res)=>{
 });
 
 memberroutes.get('/bills/getUser',isLoggedIn, (req, res)=>{
-    var user = _.pick(req.user,['firstname','lastname','street','zip','city','mitID']);
-    res.send(user);
+    var datum= new Date(req.query.jahr,req.query.monat,0,12);
+    var bDate= new Date(req.query.jahr,Number(req.query.monat)+1,0,12);
+    var start = new Date(datum.getFullYear(),datum.getMonth(),1,12);
+    var end = new Date(datum.getFullYear(),datum.getMonth()+1,0,12);
+    var uname= req.user.username;
+    var beitrag = req.user.memberships.find((x)=>{
+        return (x.membershipStart<= bDate && x.membershipEnd>= bDate) || (x.membershipStart<=bDate && x.membershipEnd.getTime()===0);
+    });
+    var user = _.pick(req.user,['_id','firstname','lastname','street','zip','city']);
+    user.billNr = `${req.query.jahr}-${req.query.monat}-${uname}`;
+    user.zeitraum= moment(datum).format('MMMM YYYY');
+    user.dueDate = moment(bDate).format('DD.MM.YYYY');
+    if(!beitrag){
+        user.beitrag = 0;
+    } else {
+        user.beitrag = beitrag.membershipFee;
+    }
+    Rent.find({
+        _member: user._id,
+        datum:{$gte: start,$lte: end}
+    }).then((rents)=>{
+        if (!rents){
+            user.summe = 0;
+        } else {
+            rents = rents.map((x)=>{
+                var pl;
+                var guests=1;
+                if (x.onlyGuests) {
+                    pl= `${x.player1} und ${x.player2}`
+                    guests = 2;
+                } else if(x.player1 === uname) {
+                    pl = x.player2;
+                } else{
+                    pl= x.player1;
+                }
+                return{
+                    datum: x.datum,
+                    player: pl,
+                    time: Math.ceil((x.ende-x.start)/360000)/10,
+                    betrag: Math.ceil(3.5*(x.ende-x.start)/360000)*guests/10
+                }
+            });
+            user.summe = rents.reduce((sum,rent)=>{
+                return sum + rent.betrag*100;
+            },0)/100;
+        }
+        res.send({
+            user: user,
+            rents: rents
+        });
+    }).catch((e)=>{
+        res.send(e);
+    });
 });
 
 memberroutes.get('/bills/single/:time',isLoggedIn,(req,res)=>{
