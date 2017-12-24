@@ -10,7 +10,7 @@
             <div id="formContainer" class="container-fluid p-2 rounded col-10 col-md-6">
                 <form id="downloadForm"> 
                     <div class="form-group">
-                        <h4>Rechnungen herunterladen</h4>
+                        <h4>Rechnungen verwalten</h4>
                         <hr>
                         {{> alerts}}
                         <label for="datum" class="form-control-label float-left text-secondary">Monat:</label>
@@ -34,8 +34,9 @@
                             <option value="0">Wähle ein Jahr aus</option>
                         </select>
                         <hr>
+                        <a href="/board/makebills"><button id="summarize" class="btn btn-info">Schreiben</button></a>
                         <button id="download" class="btn btn-success">Herunterladen</button>
-                        {{!-- <button id="test" class="btn btn-success">Test</button> --}}
+                        <a href="/board/sendbills"><button id="sendmails" class="btn btn-info">Senden</button></a>
                     </div>
                 </form> 
             </div>
@@ -45,6 +46,8 @@
     {{> footer}}
     {{> scripts}}
         <!-- Optional JavaScript -->
+        <script type="text/javascript" src="/js/jspdf.min.js"></script>
+        <script type="text/javascript" src="/js/printbill.js"></script>
         <script type="text/javascript" src="/js/download.js"></script>
     </body>
 </html>

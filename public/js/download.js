@@ -41,6 +41,9 @@ $(function(){
             },
             success: function(data){
                 console.log(data);
+                data.forEach(function(elem){
+                    printbill(elem.user,elem.rents);
+                });
             }
         })
     });
