@@ -103,6 +103,13 @@ memberroutes.get('/lastmonths',(req,res)=>{
         if (!rents) {
             return res.status(404).send('keine ergebnisse gefunden');
         }
+        rents.sort((a,b)=>{
+            if (a._id<b._id){
+                return 1;
+            } else {
+                return -1;
+            }
+        });
         res.send(rents);
     }).catch((err)=>{
         res.send({

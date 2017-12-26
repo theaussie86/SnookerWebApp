@@ -40,6 +40,7 @@ $(function(){
         type: 'GET',
         url: '/members/lastmonths',
         success: function(umsaetze){
+            console.log(umsaetze);
             $('#navbarNavAltMarkup').removeClass('show');
             umsaetze.forEach((m) => {
                 var li = `<li>Umsatz Gäste ${moment().month(m._id-1).format('MMMM')}: <strong>${(m.umsatz/100).toFixed(2).replace('.', ",")} €</strong></li>`
