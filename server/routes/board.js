@@ -1,6 +1,9 @@
+require('./../config/config');
+
 const express = require('express');
 const _ = require('lodash');
 const moment = require('moment');
+const nodemailer = require('nodemailer');
 
 const {User} = require('./../models/user');
 const {Break} = require('./../models/break');
@@ -202,6 +205,54 @@ boardroutes.get('/bills',isAdmin,(req,res)=>{
     }).catch((e)=>{
         req.flash('error_msg',`Es ist ein Fehler aufgetreten. ${e}.`);
         res.redirect('/members');
+    });
+});
+
+boardroutes.get('/sendbills',isAdmin,(req, res)=>{
+    var datum= new Date(req.query.jahr,req.query.monat,0,12);
+    User.find({}).then((users)=>{
+        users = users.filter((x)=>{
+            return x.memberships.findIndex((x)=>{
+                return (x.membershipStart<=datum && x.membershipEnd.getTime()===0) || (x.membershipStart<datum && x.membershipEnd>=datum)
+            }) != -1;
+        }).forEach((user,i,arr)=>{
+            if (user.email.indexOf('@fake.com')=== -1) {
+                var rechnung = user.bills.find((x)=>{
+                    return (x.billDate.getTime() === datum.getTime());
+                });
+                user= _.pick(user,['username','email']);
+                user.bill = rechnung;
+                var smtpTransport = nodemailer.createTransport({
+                    service: 'gmail',
+                    auth: {
+                      user: process.env.EMAIL_USER,
+                      pass: process.env.EMAIL_PASS
+                    },
+                    tls:{
+                        rejectUnauthorized:false
+                    }
+                });
+                var mailOptions = {
+                    to: user.email,
+                    from: 'snookertempel@gmail.com',
+                    subject: `Rechnung ${moment(user.bill.billDate).format('MMMM YYYY')}`,
+                    text: `Hallo ${user.username},\n\n` +
+                        `unten aufgeführt findest du die Details zu deiner Rechnung aus ${moment(user.bill.billDate).format('MMMM YYYY')}:\n\tGastumsatz ${moment(user.bill.billDate).format('MMMM')}: ${(user.bill.visitorsSales).toFixed(2).replace('.',',')+' €'}\n`+
+                        `\tBeitrag ${moment().month(user.bill.billDate.getMonth()+1).format('MMMM')}: ${(user.bill.membershipFee).toFixed(2).replace('.',',')+' €'}\n\n`+
+                        `Die gesamte Rechnung kannst du dir auf http://${req.headers.host}/members/bills herunterladen.\n\nMit freundlichen Gruß\nSnookerclub Neubrandenburg`
+                };
+                smtpTransport.sendMail(mailOptions, function(err, info) {
+                    if (err){
+                        console.log(err);
+                    }
+                });
+            } 
+            req.flash('success_msg', 'Emails gesendet.');
+            res.send();
+        });
+    }).catch((e)=>{
+        req.flash('error_msg', 'Fehler. '+e);
+        res.send();
     });
 });
 

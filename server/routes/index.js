@@ -114,7 +114,7 @@ router.post('/forgot',(req,res,next)=>{
 });
 
 router.get('/reset/:token',(req,res)=>{
-    User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } },(er, user)=>{
+    User.findOne({resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } },(er, user)=>{
         if (!user) {
             req.flash('error_msg','Password Reset Link ist ungültig oder abgelaufen.');
             return res.redirect('/forgot');

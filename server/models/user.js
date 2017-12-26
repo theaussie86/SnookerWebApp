@@ -22,11 +22,7 @@ const billSchema = new mongoose.Schema({
     membershipFee: Number,
     feePaid: {type:Boolean,default: false},
     visitorsSales: Number,
-    salesPaid: {type:Boolean,default: false},
-    sent:{
-        type: Boolean,
-        default: false,
-    }
+    salesPaid: {type:Boolean,default: false}
 });
 
 const UserSchema = new mongoose.Schema({
