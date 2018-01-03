@@ -84,6 +84,7 @@ const UserSchema = new mongoose.Schema({
     },
     memberships:[membershipSchema],
     bills:[billSchema],
+    DoB: Date,
     mitID: Number
 });
 

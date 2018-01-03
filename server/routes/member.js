@@ -90,24 +90,26 @@ memberroutes.get('/lastmonths',(req,res)=>{
             }                
         }
     },{
-        $match:{
-            year: new Date().getFullYear(),
-            $or:[{month:new Date().getMonth()+1},{month:new Date().getMonth()},{month:new Date().getMonth()-1}]                
-        }
-    },{
         $group:{
-            _id: "$month",
+            _id: {month:"$month",year:"$year"},
             umsatz: {$sum: "$betrag"}
         }
     }).then((rents)=>{
         if (!rents) {
             return res.status(404).send('keine ergebnisse gefunden');
         }
-        rents.sort((a,b)=>{
-            if (a._id<b._id){
+        var x = (moment().subtract(2,'months').format('M YYYY')).split(' ');
+        var y = (moment().subtract(1,'months').format('M YYYY')).split(' ');
+        var z = (moment().format('M YYYY')).split(' ');
+        rents=rents.filter((elem)=>{
+            return (elem._id.month===Number(x[0]) && elem._id.year===Number(x[1])) || (elem._id.month===Number(y[0]) && elem._id.year===Number(y[1])) || (elem._id.month===Number(z[0]) && elem._id.year===Number(z[1]));
+        },[]).sort((a,b)=>{
+            if (a._id.year<b._id.year){
                 return 1;
-            } else {
+            } else if(a._id.year>b._id.year){
                 return -1;
+            } else {
+                return (a._id.month>b._id.month)?-1:1
             }
         });
         res.send(rents);

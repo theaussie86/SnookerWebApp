@@ -43,7 +43,7 @@ $(function(){
             console.log(umsaetze);
             $('#navbarNavAltMarkup').removeClass('show');
             umsaetze.forEach((m) => {
-                var li = `<li>Umsatz Gäste ${moment().month(m._id-1).format('MMMM')}: <strong>${(m.umsatz/100).toFixed(2).replace('.', ",")} €</strong></li>`
+                var li = `<li>Umsatz Gäste ${moment().month(m._id.month-1).format('MMMM')}: <strong>${(m.umsatz/100).toFixed(2).replace('.', ",")} €</strong></li>`
                 $('#Kennzahlen').append(li);                
             });
         }

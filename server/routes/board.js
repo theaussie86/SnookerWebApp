@@ -143,20 +143,20 @@ boardroutes.get('/userbreaks',isAdmin,(req,res)=>{
     });
 });
 
-boardroutes.get('/deletebreak/:datum/:player/:break',isAdmin,(req,res)=>{
-    var dateParts = req.params.datum.split('.');
+boardroutes.get('/deletebreak',isAdmin,(req,res)=>{
+    var dateParts = req.query.datum.split('.');
     var dat = new Date(dateParts[2],dateParts[1]-1,dateParts[0],12);
-    var player = he.decode(req.params.player);
+    var player = req.query.player;
     Break.findOneAndRemove({
         datum: dat,
         player: player,
-        break: req.params.break
+        break: req.query.break
     },(err, serie)=>{ 
         if(err){
             req.flash({'error_msg':`Es ist ein Fehler aufgetreten. ${err}.`});
             res.send();
         }
-        req.flash('success_msg',`Break ${serie.break} von ${serie.player} wurde gelöscht.`)
+        req.flash('success_msg',`Break ${serie.break} von ${serie.player} wurde gelöscht.`);
         res.send(serie);
     });
 });

@@ -29,7 +29,15 @@ $(function(){
                             data.info+'</div>');
                         }
                     } else {
-                        data.forEach((b,i) => {
+                        data.sort((a,b)=>{
+                            if (a.break < b.break) {
+                                return 1;
+                            } else if (a.break > b.break) {
+                                return -1;
+                            } else {
+                              return 0;
+                            }
+                        }).forEach((b,i) => {
                             $('#myBreaks').append('<tr><th>'+(i+1)+'.'+'</th><td>'+
                             moment(b.datum).format('DD.MM.YYYY')+'</td><td>'+
                             b.player+'</td><td>'+
@@ -50,7 +58,12 @@ $(function(){
 
         $.ajax({
             type: 'GET',
-            url: '/board/deletebreak/'+datum+'/'+player+'/'+serie,
+            url: '/board/deletebreak',
+            data:{
+                datum: datum,
+                player: player,
+                break: serie
+            },
             success: function(serie){
                 location.reload();
             }
