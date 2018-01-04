@@ -456,6 +456,7 @@ boardroutes.get('/editbill',isAdmin, (req,res)=>{
     User.findOne({
         username: username
     }).then((user)=>{
+        // finde den Index
         var index= user.bills.map(x=>x.billDate.getTime()).indexOf(Number(req.query.datum));
         user.bills[index].salesPaid=req.query.salesPaid;
         user.bills[index].feePaid=req.query.feePaid;
