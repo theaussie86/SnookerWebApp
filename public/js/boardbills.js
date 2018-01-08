@@ -18,7 +18,7 @@ $(function(){
         var gast = $tds[2].textContent.trim();
         var beitrag = $tds[3].textContent.trim();
         var username = $tds[1].textContent.trim();
-        // console.log(datum+', '+gast+', '+beitrag);
+        console.log(datum+', '+gast+', '+beitrag);
         $('#billModalLabel').text('Rechnung '+$tds[0].textContent+' von '+username);
         $('#lblBeitrag').text('Beitrag '+moment().month(monat).format('MMMM')+':');
         $('#beitrag').text(beitrag);
@@ -34,6 +34,7 @@ $(function(){
                 datum: datum
             },
             success: function(data){
+                console.log(data);
                 if (data[0].salesPaid) $('#salesPaid').prop('checked', true);
                 if (data[0].feePaid) $('#feePaid').prop('checked', true);
             }
