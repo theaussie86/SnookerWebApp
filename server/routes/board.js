@@ -4,6 +4,7 @@ const express = require('express');
 const _ = require('lodash');
 const moment = require('moment');
 const nodemailer = require('nodemailer');
+const {MongoClient} = require('mongodb');
 
 const {User} = require('./../models/user');
 const {Break} = require('./../models/break');
@@ -451,21 +452,21 @@ boardroutes.get('/singlebill',isAdmin, (req,res)=>{
 });
 
 boardroutes.get('/editbill',isAdmin, (req,res)=>{
-    const username = req.query.username;
-    const datum =req.query.datum;
-    User.findOne({
-        username: username
-    }).then((user)=>{
-        // finde den Index
-        var index= user.bills.map(x=>x.billDate.getTime()).indexOf(Number(req.query.datum));
-        user.bills[index].salesPaid=req.query.salesPaid;
-        user.bills[index].feePaid=req.query.feePaid;
-        user.save();
-        res.send({
-            'success_msg':`Rechnung von ${moment(Number(datum)).format('MMMM YYYY')} von ${username} geändert.`
-        });
-    }).catch((e)=>{
-        res.send({'error_msg':`Es ist ein Fehler aufgetreten. ${e}.`});
+    var datum = new Date(Number(req.query.datum));
+
+    MongoClient.connect(process.env.MONGODB_URI,(err, db)=>{
+        if (err) {res.send({'error_msg':`Es ist ein Fehler aufgetreten. ${err}.`});} else {
+            db.collection('users').update({
+                username: req.query.username,
+                'bills.billDate': datum
+            },{
+                $set:{
+                    'bills.$.salesPaid': req.query.salesPaid,
+                    'bills.$.feePaid': req.query.feePaid
+                }
+            }, false, true);
+            res.send({'success_msg':`Rechnung vom ${moment(Number(req.query.datum)).format('DD.MM.YYYY')} von ${req.query.username} geändert.`});
+        }
     });
 });
 
