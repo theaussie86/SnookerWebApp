@@ -377,7 +377,6 @@ boardroutes.get('/makebills',isAdmin,(req,res)=>{
 });
 
 boardroutes.get('/filterbills',isAdmin,(req,res)=>{
-    console.log(req.query);
     User.aggregate([{$unwind: "$bills"},{
         $project:{
             _id: false,
@@ -437,6 +436,7 @@ boardroutes.get('/singlebill',isAdmin, (req,res)=>{
     User.findOne({
         username: username
     }).then((user)=>{
+        
         var bill = user.bills.filter((x)=> {
             return x.billDate.getTime()===Number(datum);
         }).map((x)=>{

@@ -14,11 +14,10 @@ $(function(){
         var datum = $tds[0].textContent.split(' ');
         var monat = moment().month(datum[0]).format('M');
         var Jahr = Number(datum[1]);
-        datum = new Date(Jahr,monat,0,12).getTime();
+        datum = new Date(Date.UTC(Jahr,monat,0,12)).getTime();
         var gast = $tds[2].textContent.trim();
         var beitrag = $tds[3].textContent.trim();
         var username = $tds[1].textContent.trim();
-        console.log(datum+', '+gast+', '+beitrag);
         $('#billModalLabel').text('Rechnung '+$tds[0].textContent+' von '+username);
         $('#lblBeitrag').text('Beitrag '+moment().month(monat).format('MMMM')+':');
         $('#beitrag').text(beitrag);
@@ -34,7 +33,6 @@ $(function(){
                 datum: datum
             },
             success: function(data){
-                console.log(data);
                 if (data[0].salesPaid) $('#salesPaid').prop('checked', true);
                 if (data[0].feePaid) $('#feePaid').prop('checked', true);
             }
@@ -49,7 +47,7 @@ $(function(){
         var username = header[4];
         var monat = moment().month(header[1]).format('M');
         var jahr = Number(header[2]);
-        var billDate= new Date(jahr,monat,0,12).getTime();
+        var billDate= new Date(Date.UTC(jahr,monat,0,12)).getTime();
         $.ajax({
             method: 'GET',
             url: '/board/editbill',
