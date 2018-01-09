@@ -24,7 +24,6 @@ const {mongoose} = require('./db/mongoose');
 const {User} = require('./models/user');
 const {Break} = require('./models/break');
 const {Rent} = require('./models/rent');
-const {importRouter} = require('./routes/import');
 const {router}=require('./routes/index');
 const {memberroutes}=require('./routes/member');
 const {dataroutes}=require('./routes/data');
@@ -77,17 +76,6 @@ app.use('/board',boardroutes);
 app.set('views',publicPath+'/views');
 hbs.registerPartials(publicPath+ '/views/partials');
 app.set('view engine','hbs');
-
-// server log
-app.use((req, res, next) => {
-    var now = new Date().toString();
-    var log = `${now}: ${req.method} ${req.url}`;
-
-    fs.appendFile('server.log',log + '\n', (err) => {
-        if (err) console.log('Unable to append to server.log.');
-    });
-    next();
-});
 
 // app.use((req, res, next) => {
 //     res.render('maintenance.hbs');
