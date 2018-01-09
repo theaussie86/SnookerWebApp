@@ -20,6 +20,15 @@ router.get('/',(req,res)=>{
     });
 });
 
+// ABOUT
+
+router.get('/about',(req,res)=>{
+    res.render('about.hbs',{
+        title: 'Impressum',
+        user: req.user
+    });
+});
+
 // LOGIN
 router.get('/login',(req,res)=>{
     
