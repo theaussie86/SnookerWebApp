@@ -164,9 +164,32 @@ boardroutes.get('/deletebreak',isAdmin,(req,res)=>{
 
 // VISITORS
 boardroutes.get('/visitors',isAdmin,(req,res)=>{
-    res.render('bvisitors.hbs',{
-        title: 'Umsatzverwaltung',
-        user: req.user
+    Rent.find({}).then((rents)=>{
+        rents = rents.map((x)=>{
+            var guests = 1;
+            var pl;
+            if(x.onlyGuests) {
+                guests=2;
+                pl = x.player1+' und '+x.player2;
+            } else if(x.player1 === req.user.username){
+                pl = x.player2;
+            } else {
+                pl = x.player1;
+            }
+            return {
+                datum: x.datum,
+                player: pl,
+                onlyGuests: x.onlyGuests,
+                spielzeit: (Math.ceil((x.ende-x.start)/360000)/10),
+                betrag: Math.ceil((x.ende-x.start)*3.5/360000)*guests*10
+            }
+        }).sort((a,b)=>b.datum-a.datum);
+        res.send({
+            rents:rents,
+            admin: true
+        });
+    }).catch((err)=>{
+        res.send({err:'Fehler! '+err});
     });
 });
 

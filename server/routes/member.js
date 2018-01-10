@@ -232,7 +232,7 @@ memberroutes.get('/visitors/get',isLoggedIn,(req,res)=>{
                 player: pl,
                 onlyGuests: x.onlyGuests,
                 spielzeit: (Math.ceil((x.ende-x.start)/360000)/10),
-                betrag: Math.ceil((x.ende-x.start)*3.5/360000)*guests/10
+                betrag: Math.ceil((x.ende-x.start)*3.5/360000)*guests*10
             }
         });
         res.send({

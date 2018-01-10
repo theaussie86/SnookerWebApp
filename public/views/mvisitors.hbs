@@ -37,10 +37,16 @@
                             </select>
                             </div>
                             <div class="col-2"><p class="align-bottom">Summe der Umsätze: <br><strong id="Umsatzsumme">{{formatCurrency umsatz}}</strong></p></div>
+                            <div class="col-2 form-check">
+                            <label class="form-check-label">
+                                <input class="form-check-input" id="checkAllVisitors" type="checkbox" value="">
+                                Alle Umsätze verwalten
+                            </label>
+                            </div>
                         </div>
                         {{/if}}
                         {{> alerts}}                        
-                        <p><h5>Meine Umsätze mit Gastspielern</h5></p>
+                        <p><h5 id="heading">Meine Umsätze mit Gastspielern</h5></p>
                         <table class="table table-border">
                         <thead>
                             <tr>

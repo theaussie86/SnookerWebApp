@@ -6,10 +6,8 @@ const path = require('path');
 const hbs = require('hbs');
 const bodyParser = require('body-parser');
 const session = require('express-session');
-const {ObjectID}=require('mongodb');
 const _ = require('lodash');
 const bcrypt = require('bcryptjs');
-const fs = require('fs');
 const flash = require('connect-flash');
 const passport = require('passport');
 const MongoStore = require('connect-mongo')(session);
@@ -29,7 +27,6 @@ const {memberroutes}=require('./routes/member');
 const {dataroutes}=require('./routes/data');
 const {boardroutes}=require('./routes/board');
 const {isLoggedIn, isAdmin, CheckLoginForm, CheckRegisterForm} = require('./middleware/authenticate');
-const {fillBills} = require('./db/import/update');
 
 var app = express();
 
@@ -66,7 +63,6 @@ app.set('port', (process.env.PORT || 3000));
 require('./middleware/passport')(passport);
 
 // Middleware for Routes
-app.use('/import',importRouter);
 app.use('/',router);
 app.use('/members',memberroutes);
 app.use('/data',dataroutes);
