@@ -85,7 +85,8 @@ const UserSchema = new mongoose.Schema({
     memberships:[membershipSchema],
     bills:[billSchema],
     DoB: Date,
-    mitID: Number
+    mitID: Number,
+    bild: String
 });
 
 UserSchema.statics.findByCredentials = function(username,password){

@@ -12,7 +12,7 @@ $(function(){
                         moment(b.datum).format('DD.MM.YYYY')+'</td><td>'+
                         b.player+'</td><td>'+
                         b.break+
-                        '</td><td><button role="button" class="btn btn-primary deleteBreak">Löschen</button></td></tr>')
+                        '</td><td><button role="button" class="btn btn-danger deleteBreak">Löschen</button></td></tr>')
                     });
                 }
             });

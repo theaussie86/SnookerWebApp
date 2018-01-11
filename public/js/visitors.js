@@ -68,7 +68,43 @@ $(function(){
             $('#heading').text('Meine Umsätze mit Gastspielern');
             $('#month').parent().toggle();
             $('#year').parent().toggle();
+            $('#myVisitors').empty();
+            $.ajax({
+                type:'GET',
+                url:'/board/uservisitors',
+                success: function(data){
+                    var umsatzsumme=parseRents(data);
+                
+                    $('#Umsatzsumme').text(umsatzsumme.toFixed(2).replace('.',',')+' €');
+                }
+            });
         }
+    });
+
+    $(document).on('click','.deleteVisitor',function(){
+        var $row = $(this).closest('tr').children();
+        
+        var datum= $row[0].textContent.split('.');
+        var player= $row[1].textContent.split(' ');
+        var betrag= $row[3].textContent.split(' ');
+
+        datum =new Date(Number(datum[2]),Number(datum[1])-1,Number(datum[0]),12) ;
+        var player1 = player[0];
+        var player2 = player[2];
+        console.log(datum,player1,player2);
+
+        $.ajax({
+            type:'GET',
+            data:{
+                datum:datum,
+                player1:player1,
+                player2:player2
+            },
+            url:'/board/deletevisitor',
+            success: function(data){
+                location.reload();
+            }
+        })
     });
 
     var parseRents = function(data){
@@ -78,7 +114,7 @@ $(function(){
             var Datum = moment(element.datum).format('DD.MM.YYYY');
             var row = '<tr><td>'+Datum+'</td><td>'+element.player+'</td><td>'+element.spielzeit.toFixed(1).replace('.',',')+' h'+'</td><td>'+(element.betrag/100).toFixed(2).replace('.', ",")+' €'+'</td>'
             if (data.admin){
-                row+='<td><button role="button" class="btn btn-danger deleteBreak">Löschen</button></td></tr>';
+                row+='<td><button role="button" class="btn btn-danger deleteVisitor">Löschen</button></td></tr>';
             } else {
                 row += '</tr>';
             }

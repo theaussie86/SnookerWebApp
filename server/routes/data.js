@@ -42,6 +42,7 @@ dataroutes.get('/entervisitor',isLoggedIn,(req,res)=>{
 
 dataroutes.post('/entervisitor',isLoggedIn,(req,res)=>{
     var body = _.pick(req.body,['datum','player1','player2','start','ende']);
+    body.datum= new Date(body.datum).setHours(12);
     body.start = moment(body.start,'hh:mm');
     body.ende = moment(body.ende,'hh:mm');
     if(body.start>body.ende){

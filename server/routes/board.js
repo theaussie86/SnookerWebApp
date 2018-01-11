@@ -167,6 +167,32 @@ boardroutes.get('/visitors',isAdmin,(req,res)=>{
     Rent.find({}).then((rents)=>{
         rents = rents.map((x)=>{
             var guests = 1;
+            var pl=x.player1+' und '+x.player2;;
+            if(x.onlyGuests) {
+                guests=2;
+            }
+            return {
+                datum: x.datum,
+                player: pl,
+                onlyGuests: x.onlyGuests,
+                spielzeit: (Math.ceil((x.ende-x.start)/360000)/10),
+                betrag: Math.ceil((x.ende-x.start)*3.5/360000)*guests*10
+            }
+        }).sort((a,b)=>b.datum-a.datum);
+        res.send({
+            rents:rents,
+            admin: true
+        });
+    }).catch((err)=>{
+        res.send({err:'Fehler! '+err});
+    });
+});
+
+boardroutes.get('/uservisitors',isAdmin,(req,res)=>{
+    var userId = req.user._id;
+    Rent.find({_member: userId}).then((rents)=>{
+        rents = rents.map((x)=>{
+            var guests = 1;
             var pl;
             if(x.onlyGuests) {
                 guests=2;
@@ -185,11 +211,27 @@ boardroutes.get('/visitors',isAdmin,(req,res)=>{
             }
         }).sort((a,b)=>b.datum-a.datum);
         res.send({
-            rents:rents,
-            admin: true
+            username: req.user.username,
+            rents:rents
         });
     }).catch((err)=>{
         res.send({err:'Fehler! '+err});
+    });
+});
+
+boardroutes.get('/deletevisitor',isAdmin,(req,res)=>{
+    console.log(req.query);
+    Rent.findOneAndRemove({
+        datum:req.query.datum,
+        player1: req.query.player1,
+        player2: req.query.player2,
+    },(err, rent)=>{ 
+        if(err){
+            req.flash({'error_msg':`Es ist ein Fehler aufgetreten. ${err}.`});
+            res.send();
+        }
+        req.flash('success_msg',`Eintrag vom ${moment(rent.datum).format('DD.MM.YYYY')} mit ${rent.player1} und ${rent.player2} wurde gelöscht.`);
+        res.send(rent);
     });
 });
 
