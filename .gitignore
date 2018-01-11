@@ -3,3 +3,4 @@ package-lock.json
 server/config/config.json
 server.log
 playground
+public/img/marian.jpg
