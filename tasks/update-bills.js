@@ -1,36 +1,23 @@
-require('./server/config/config');
+require('./../server/config/config');
 
-const jake = require('jake');
 const moment = require('moment');
 const async = require('async');
 const {MongoClient, ObjectID} = require('mongodb');
 
-const isAsync = '{async: true}';
 moment.locale('de');
-
-desc('Alle Bills entfernen');
-task('pullBills',function(){
-    MongoClient.connect(process.env.MONGODB_URI,(err,db)=>{
-        if (err) return console.log('Unable to connect to MongoDB server.');
-        db.collection('users').updateMany({},{$set: {bills:[]}});
-        db.close();
-    });
-});
 
 let vdate = new Date(Date.UTC(new Date().getFullYear(),new Date().getMonth(),0,12));
 
-desc('Parameter ermitteln.');
-task('updateBills',isAsync,function(){
-    async.waterfall([
-        async.apply(getParams,vdate),
-        getSales,
-        updateUserBills
-    ],(err, result)=>{
-        if (err) console.log(err);
-        console.log(result);
-        complete();
-    });
+
+async.waterfall([
+    async.apply(getParams,vdate),
+    getSales,
+    updateUserBills
+],(err, result)=>{
+    if (err) console.log(err);
+    console.log(result);
 });
+
 
 
 function updateUserBills(newBills,callback){
@@ -83,6 +70,8 @@ function getSales(queryParams,callback){
 }
 
 function getParams(datum, callback){
+    if (datum.getDate()!==3) return callback('------ Heute ist nicht der 3. des Monats! -------');                
+
     let params = [];
     console.log('+++++++++++++++++++++  Sammle Daten ein...');
     MongoClient.connect(process.env.MONGODB_URI,(err, db) => {
@@ -127,7 +116,7 @@ function getParams(datum, callback){
             });
             if (params.length === 0){
                 db.close();
-                throw new Error('------ Alle Rechnungen sind auf dem neuesten Stand -------');                
+                return callback('------ Alle Rechnungen sind auf dem neuesten Stand -------');                
             } else {
                 callback(null, params);
                 db.close();

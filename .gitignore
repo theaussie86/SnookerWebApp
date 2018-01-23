@@ -4,3 +4,4 @@ server/config/config.json
 server.log
 playground
 public/img/marian.jpg
+tasks/delete-bills.js
