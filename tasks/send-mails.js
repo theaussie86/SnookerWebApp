@@ -23,7 +23,7 @@ MongoClient.connect(process.env.MONGODB_URI,(err, db) => {
                 return (x.membershipStart<=datum && x.membershipEnd.getTime()===0) || (x.membershipStart<datum && x.membershipEnd>=datum)
             }) != -1;
         }).forEach((user)=>{
-            if (user.email.indexOf('mrasek')!== -1) {
+            if (user.email.indexOf('@fake.com')=== -1) {
                 var rechnung = user.bills.find((x)=>{
                     return (x.billDate.getTime() === datum.getTime());
                 });
