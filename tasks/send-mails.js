@@ -9,7 +9,7 @@ moment.locale('de');
 
 let datum = new Date(Date.UTC(new Date().getFullYear(),new Date().getMonth(),0,12));
 
-if (datum.getDate()!==3) {
+if (new Date().getDate()!==3) {
     console.log('------ Heute ist nicht der 3. des Monats! -------');                
 }else{
 console.log('+++++++++++++++++++++  Sammle Daten für Emailversand ein...');

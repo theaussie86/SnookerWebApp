@@ -40,6 +40,10 @@ const UserSchema = new mongoose.Schema({
         }
     },
     handy: String,
+    sharedetails: {
+        type: Boolean,
+        default: false
+    },
     festnetz: String,
     password:{
         type: String,

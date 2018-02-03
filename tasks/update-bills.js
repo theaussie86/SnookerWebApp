@@ -70,7 +70,7 @@ function getSales(queryParams,callback){
 }
 
 function getParams(datum, callback){
-    if (datum.getDate()!==3) return callback('------ Heute ist nicht der 3. des Monats! -------');                
+    if (new Date().getDate()!==3) return callback('------ Heute ist nicht der 3. des Monats! -------');                
 
     let params = [];
     console.log('+++++++++++++++++++++  Sammle Daten ein...');
@@ -88,7 +88,7 @@ function getParams(datum, callback){
                     if (user.bills[user.bills.length-1].billDate>=datum) return;
                 }
                 var out = {id: ObjectID(user._id),bills:[]};
-                while (enddate <= datum) {
+                while (enddate < datum) {
                     enddate = new Date(Date.UTC(enddate.getFullYear(),enddate.getMonth()+2,0,12));
                     var idx = user.memberships.map((x)=>x.membershipEnd.getTime()).indexOf(enddate.getTime());
                     var beitrag;

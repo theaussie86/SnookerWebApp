@@ -36,12 +36,18 @@
                                         {{#if user.handy}}
                                         <label for="handy">Handynummer</label>
                                         <input type="text" class="form-control change" name="handy" id="handy" placeholder="{{user.handy}}" readonly>
+                                        <div class="form-check">
+                                            <label class="form-check-label">
+                                            <input type="checkbox" class="form-check-input" {{#if user.sharedetails}}checked{{/if}}>
+                                            Meine Handynummer veröffentlichen
+                                            </label>
+                                        </div>
                                         {{/if}}
-                                        {{#if user.festnetz}}
+                                        {{!-- {{#if user.festnetz}}
                                         <label for="festnetz">Festnetznummer</label>
                                         <input type="text" class="form-control change" name="festnetz" id="festnetz" placeholder="{{user.festnetz}}" readonly>
-                                        {{/if}}
-                                    </div>
+                                        {{/if}} --}}
+                                      </div>
                                     <hr>
                                     <div class="form-group">
                                         <div class="form-row">
@@ -64,10 +70,10 @@
                                     <div class="form-row">
                                         <div class="form-inline">
                                         <button type="button" id="change" class="btn btn-primary m-1">Ändern</button>
-                                        {{!-- <button type="button" id="changeUsername" class="btn btn-primary m-1">Username ändern</button> --}}
-                                        {{!-- {{#unless user.handy}}
+                                        {{!-- <button id="changeUsername" class="btn btn-primary m-1">Username ändern</button> --}}
+                                        {{#unless user.handy}}
                                         <button type="button" id="changeMobile" class="btn btn-primary m-1">Handynummer hinzufügen</button>                                        
-                                        {{/unless}} --}}
+                                        {{/unless}}
                                         </div>
                                     </div>                                    
                                 </form>
