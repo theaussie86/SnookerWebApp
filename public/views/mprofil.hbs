@@ -33,16 +33,10 @@
                                     <div class="form-group">
                                         <label for="email">Emailadresse</label>
                                         <input type="email" class="form-control change" name="email" id="email" placeholder="{{user.email}}" readonly>
-                                        {{#if user.handy}}
+                                        {{!-- {{#if user.handy}} --}}
                                         <label for="handy">Handynummer</label>
                                         <input type="text" class="form-control change" name="handy" id="handy" placeholder="{{user.handy}}" readonly>
-                                        <div class="form-check">
-                                            <label class="form-check-label">
-                                            <input type="checkbox" class="form-check-input" {{#if user.sharedetails}}checked{{/if}}>
-                                            Meine Handynummer veröffentlichen
-                                            </label>
-                                        </div>
-                                        {{/if}}
+                                        {{!-- {{/if}} --}}
                                         {{!-- {{#if user.festnetz}}
                                         <label for="festnetz">Festnetznummer</label>
                                         <input type="text" class="form-control change" name="festnetz" id="festnetz" placeholder="{{user.festnetz}}" readonly>
@@ -77,6 +71,13 @@
                                         </div>
                                     </div>                                    
                                 </form>
+                                <hr>
+                                <div class="form-check">
+                                    <label class="form-check-label">
+                                    <input type="checkbox" class="form-check-input" id="sharedetails" {{#if user.sharedetails}}checked{{/if}}>
+                                    mich im Mitgliederverzeichnis anzeigen
+                                    </label>
+                                </div>
                                 <hr>
                                 <div class="row">
                                     <p>

@@ -82,6 +82,7 @@ dataroutes.get('/profile',isLoggedIn,(req,res)=>{
 
 dataroutes.post('/profile',isLoggedIn, (req,res)=>{
     var body = req.body;
+    console.log(body);
     var info = "";  
     User.findById(req.user._id).then(async (user)=>{ 
         if(body.username && user.username != body.username) {
@@ -133,6 +134,18 @@ dataroutes.post('/profile',isLoggedIn, (req,res)=>{
     }).catch((e)=>{
         req.flash('error_msg','Fehler! '+e);
         res.redirect('/data/profile');    
+    });
+});
+
+dataroutes.get('/details',isLoggedIn, (req,res)=>{
+    console.log(req.query);
+    var id = req.user._id;
+    User.findById(id).then((user)=>{
+        user.sharedetails = req.query.share;
+        user.save();
+        res.send({'success_msg':'Status von Details Teilen abgespeichert.'});
+    }).catch((e)=>{
+        res.send({'error_msg':'Fehler beim Speichern von Details teilen.\n'+e});
     });
 });
 
