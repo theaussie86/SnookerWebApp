@@ -113,15 +113,18 @@
             </div>
             <div class="modal-body">
                 <div id="pic"></div>
-                {{!-- <div class="input-group mb-3"> --}}
-
-                {{!-- </div> --}}
+                <form action="/upload" method="POST" enctype="multipart/form-data">
+                    <div class="input-group">
+                        <span class="input-group-btn">
+                            <span class="btn btn-default btn-file">
+                            <input type="file" name="uploadPic" id="uploadPic">
+                            </span>
+                        </span>
+                        <button type="subit" class="btn btn-primary">Speichern</button>
+                    </div>
+                </form>
             </div>
             <div class="modal-footer">
-                <div class="custom-file btn btn-primary">
-                    <input type="file" class="custom-file-input" id="inputGroupFile01">
-                    {{!-- <label class="custom-file-label" for="inputGroupFile01">Bild Hochladen</label> --}}
-                </div>
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Schließen</button>
             </div>
 

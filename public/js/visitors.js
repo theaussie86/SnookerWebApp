@@ -88,7 +88,7 @@ $(function(){
         var player= $row[1].textContent.split(' ');
         var betrag= $row[3].textContent.split(' ');
 
-        datum =new Date(Number(datum[2]),Number(datum[1])-1,Number(datum[0]),12) ;
+        datum =new Date(Date.UTC(Number(datum[2]),Number(datum[1])-1,Number(datum[0]),12));
         var player1 = player[0];
         var player2 = player[2];
         console.log(datum,player1,player2);

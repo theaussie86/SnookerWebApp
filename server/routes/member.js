@@ -19,13 +19,10 @@ memberroutes.get('/',isLoggedIn, (req, res) =>{
 });
 
 memberroutes.get('/allmembers',isLoggedIn,(req,res)=>{
-    User.find({sharedetails:true}).then((users)=>{
+    User.find({sharedetails:true,aktiv:true}).then((users)=>{
         if (users.length==0){
-            res.render('members.hbs',{
-                title: 'Mitglieder',
-                user: req.user,
-                'info_msg':'Es stehen keine Kontaktdaten von Mitgliedern zur Verfügung'
-            });
+            req.flash('info_msg','Es stehen keine Kontaktdaten von Mitgliedern zur Verfügung');
+            res.redirect('/members');
         }
         users = users.map((x)=>{
             return {
