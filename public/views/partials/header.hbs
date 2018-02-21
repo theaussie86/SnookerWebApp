@@ -9,17 +9,11 @@
                 <ul class="nav navbar-nav">
                     {{#if user}}
                         <li class="nav-item">
-                            <a class="nav-link" id="übersicht-tab" href="/members" role="tab" aria-controls="Übersicht" aria-expanded="true">Übersicht</a>
+                            <a class="nav-link" id="dashboard-tab" href="/members" role="tab" aria-controls="Dashboard" aria-expanded="true">Dashboard</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" id="gastspieler-tab" href="/members/visitors" role="tab" aria-controls="Gastspieler">Meine Gäste</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" id="breaks-tab" href="/members/breaks" role="tab" aria-controls="Breaks">Meine Breaks</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" id="rechnungen-tab" href="/members/bills" role="tab" aria-controls="Rechnungen">Meine Rechnungen</a>
-                        </li>
+                            <a class="nav-link" id="mübersicht-tab" href="/members/allmembers" role="tab" aria-controls="MitgliederÜbersicht" aria-expanded="true">Mitgliederübersicht</a>
+                        </li>                        
                         {{#if user.isBoardMember}}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" data-toggle="dropdown" data-target="#" href="#">Vorstand</a>
@@ -35,8 +29,11 @@
                                 Hallo <span id="srtUser">{{user.username}}</span>
                             </a>
                             <div class="dropdown-menu">
-                                <a class="dropdown-item" href="/data/profile" role="button" aria-controls="dropdown1">Profil</a>
-                                <a class="dropdown-item" href="/logout" role="button" aria-controls="dropdown3">Logout</a>
+                                <a class="dropdown-item" href="/members/bills" role="button" aria-controls="Rechnungen">Meine Rechnungen</a>
+                                <a class="dropdown-item" href="/members/visitors" role="button" aria-controls="Gastspieler">Meine Gäste</a>
+                                <a class="dropdown-item" href="/members/breaks" role="button" aria-controls="Breaks">Meine Breaks</a>
+                                <a class="dropdown-item" href="/data/profile" role="button" aria-controls="Profil">Mein Profil</a>
+                                <a class="dropdown-item" href="/logout" role="button" aria-controls="Logout">Logout</a>
                             </div>
                         </li> 
                     {{else}}

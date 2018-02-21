@@ -33,14 +33,8 @@
                                     <div class="form-group">
                                         <label for="email">Emailadresse</label>
                                         <input type="email" class="form-control change" name="email" id="email" placeholder="{{user.email}}" readonly>
-                                        {{!-- {{#if user.handy}} --}}
                                         <label for="handy">Handynummer</label>
                                         <input type="text" class="form-control change" name="handy" id="handy" placeholder="{{user.handy}}" readonly>
-                                        {{!-- {{/if}} --}}
-                                        {{!-- {{#if user.festnetz}}
-                                        <label for="festnetz">Festnetznummer</label>
-                                        <input type="text" class="form-control change" name="festnetz" id="festnetz" placeholder="{{user.festnetz}}" readonly>
-                                        {{/if}} --}}
                                       </div>
                                     <hr>
                                     <div class="form-group">
@@ -64,10 +58,7 @@
                                     <div class="form-row">
                                         <div class="form-inline">
                                         <button type="button" id="change" class="btn btn-primary m-1">Ändern</button>
-                                        {{!-- <button id="changeUsername" class="btn btn-primary m-1">Username ändern</button> --}}
-                                        {{#unless user.handy}}
-                                        <button type="button" id="changeMobile" class="btn btn-primary m-1">Handynummer hinzufügen</button>                                        
-                                        {{/unless}}
+                                        <button type="button" id="profilbild" class="btn btn-primary m-1" data-toggle="modal" data-target="#picModal">Profilbild Ändern</button>                                        
                                         </div>
                                     </div>                                    
                                 </form>
@@ -75,7 +66,7 @@
                                 <div class="form-check">
                                     <label class="form-check-label">
                                     <input type="checkbox" class="form-check-input" id="sharedetails" {{#if user.sharedetails}}checked{{/if}}>
-                                    mich im Mitgliederverzeichnis anzeigen
+                                    meine Kontaktdaten im Mitgliederverzeichnis anzeigen
                                     </label>
                                 </div>
                                 <hr>
@@ -111,7 +102,32 @@
             </div>
             {{> footer}}
         </div>
+        <div class="modal fade" id="picModal" tabindex="-1" role="dialog" aria-labelledby="picModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="picModalLabel">Profilbild hochladen</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="pic"></div>
+                {{!-- <div class="input-group mb-3"> --}}
 
+                {{!-- </div> --}}
+            </div>
+            <div class="modal-footer">
+                <div class="custom-file btn btn-primary">
+                    <input type="file" class="custom-file-input" id="inputGroupFile01">
+                    {{!-- <label class="custom-file-label" for="inputGroupFile01">Bild Hochladen</label> --}}
+                </div>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Schließen</button>
+            </div>
+
+            </div>
+        </div>
+        </div>
 
         <!-- Optional JavaScript -->
 

@@ -18,6 +18,35 @@ memberroutes.get('/',isLoggedIn, (req, res) =>{
     });
 });
 
+memberroutes.get('/allmembers',isLoggedIn,(req,res)=>{
+    User.find({sharedetails:true}).then((users)=>{
+        if (users.length==0){
+            res.render('members.hbs',{
+                title: 'Mitglieder',
+                user: req.user,
+                'info_msg':'Es stehen keine Kontaktdaten von Mitgliedern zur Verfügung'
+            });
+        }
+        users = users.map((x)=>{
+            return {
+                name: `${x.firstname} ${x.lastname}`,
+                email: x.email,
+                handy: x.handy,
+                bild: x.bild
+            };
+        });
+        res.render('allmembers.hbs',{
+            title: 'Mitgliederübersicht',
+            user: req.user,
+            users: users,
+            'success_msg':`${users.length} Kontaktdetails gefunden.`
+        });
+    }).catch((e)=>{
+        req.flash('error_msg','Fehler beim Abrufen der Kontaktdaten.\n'+e);
+        res.redirect('/members');
+    });
+});
+
 memberroutes.get('/hbreaks',(req,res)=>{
     Break.aggregate({$sort:{break:-1}},{$limit: 10},{
         $project:{
