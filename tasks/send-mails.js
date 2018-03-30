@@ -49,7 +49,7 @@ if (new Date().getDate()!==3) {
                             `Bitte überweise den gesamten Rechungsbetrag von ${((user.bill.membershipFee*100+user.bill.visitorsSales*100)/100).toFixed(2).replace('.',',')+' €'} bis zum ${moment(new Date(datum.getFullYear(),datum.getMonth()+2,0,12)).format('DD.MM.YYYY')} auf folgendes Konto:\n\n\t` +
                             `IBAN: DE20150400680686090200\n\tBIC: COBADEFFXXX\n\n`+
                             `Die gesamte Rechnung kannst du dir mit einem Klick auf den folgenden Link herunterladen.\n`+
-                            `afternoon-sea-42864.herokuapp.com/data/bill/${user._id}/${user.bill._id}\n\n`+
+                            `http://afternoon-sea-42864.herokuapp.com/data/bill/${user._id}/${user.bill._id}\n\n`+
                             `Mit freundlichem Gruß\n
                             Snookerclub Neubrandenburg`
                     };

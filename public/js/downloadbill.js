@@ -13,5 +13,5 @@ $(function () {
             console.log(data);
             printbill(data.user,data.rents);
         }
-    })
+    });
 });
