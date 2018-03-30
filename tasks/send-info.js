@@ -12,7 +12,7 @@ moment.locale('de');
     MongoClient.connect(process.env.MONGODB_URI,(err, db) => {
         if (err) return console.log('Unable to connect to MongoDB server.');        
 
-        db.collection('users').find({}).toArray().then((users)=>{
+        db.collection('users').find({username:'Murat'}).toArray().then((users)=>{
             users = users.filter((x)=>{
                 return (x.aktiv || x.isBoardMember);
             }).forEach((user)=>{

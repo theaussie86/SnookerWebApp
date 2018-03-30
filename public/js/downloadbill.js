@@ -12,7 +12,6 @@ $(function () {
         success: function(data){
             console.log(data);
             printbill(data.user,data.rents);
-            window.top.close();
         }
     })
 });
