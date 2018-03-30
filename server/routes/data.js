@@ -149,5 +149,66 @@ dataroutes.get('/details',isLoggedIn, (req,res)=>{
     });
 });
 
+dataroutes.get('/bill/print',(req,res)=>{
+    // res.send(req.query);
+    User.findById(req.query.userId).then((user)=>{
+        var u = _.pick(user,['_id','firstname','lastname','street','zip','city']);
+        bill = user.bills.id(req.query.billId);
+        var datum = bill.billDate;
+        var start = new Date(datum.getFullYear(),datum.getMonth(),1,12);
+        var end = new Date(datum.getFullYear(),datum.getMonth()+1,0,12);
+        u.billNr = `${moment(datum).format('YYYY-MM')}-${user.username}`;
+        u.zeitraum= moment(datum).format('MMMM YYYY');
+        u.dueDate = moment(new Date(datum.getFullYear(),datum.getMonth()+2,0,12)).format('DD.MM.YYYY');    
+        u.beitrag = bill.membershipFee;
+        u.summe = bill.visitorsSales;
+        Rent.find({
+            _member: req.query.userId,
+            datum:{$gte: start,$lte: end}
+        }).then((rents)=>{
+            rents = rents.map((x)=>{
+                var pl;
+                var guests=1;
+                if (x.onlyGuests) {
+                    pl= `${x.player1} und ${x.player2}`
+                    guests = 2;
+                } else if(x.player1 === user.username) {
+                    pl = x.player2;
+                } else{
+                    pl= x.player1;
+                }
+                return{
+                    datum: x.datum,
+                    player: pl,
+                    time: Math.ceil((x.ende-x.start)/360000)/10,
+                    betrag: Math.ceil(3.5*(x.ende-x.start)/360000)*guests/10
+                }
+            });
+
+            var result = {
+                user:u,
+                rents: rents
+            }
+            res.send(result);
+        }).catch((e)=>{
+            throw e;
+        }); 
+        return;       
+    }).catch((err)=>{
+        res.send(err);
+    });
+});
+
+dataroutes.get('/bill/:id/:billId',(req,res)=>{
+    console.log(req.params);
+    res.render('downloadbill.hbs',{
+        title: 'Rechnung herunterladen',
+        userId: req.params.id,
+        billId: req.params.billId
+    });
+
+})
+
+
 
 module.exports = {dataroutes};

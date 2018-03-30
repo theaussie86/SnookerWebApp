@@ -69,5 +69,5 @@ doc.setFont('Calibri');
     doc.text(x1,42,'Nonnenhofer Straße 60, 17033 Neubrandenburg\nsnookertempel@gmail.com')
     doc.setFontSize
 
-doc.save(user.billNr+'.pdf');
+    doc.save(user.billNr+'.pdf');
 }

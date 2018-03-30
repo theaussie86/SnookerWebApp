@@ -27,7 +27,7 @@ if (new Date().getDate()!==3) {
                     var rechnung = user.bills.find((x)=>{
                         return (x.billDate.getTime() === datum.getTime());
                     });
-                    user= _.pick(user,['username','email']);
+                    user= _.pick(user,['username','email','_id']);
                     user.bill = rechnung;
                     var smtpTransport = nodemailer.createTransport({
                         service: 'gmail',
@@ -47,15 +47,17 @@ if (new Date().getDate()!==3) {
                             `unten aufgeführt findest du die Details zu deiner Rechnung aus ${moment(user.bill.billDate).format('MMMM YYYY')}:\n\tGastumsatz ${moment(user.bill.billDate).format('MMMM')}: ${(user.bill.visitorsSales).toFixed(2).replace('.',',')+' €'}\n`+
                             `\tBeitrag ${moment().month(user.bill.billDate.getMonth()+1).format('MMMM')}: ${(user.bill.membershipFee).toFixed(2).replace('.',',')+' €'}\n\n`+
                             `Bitte überweise den gesamten Rechungsbetrag von ${((user.bill.membershipFee*100+user.bill.visitorsSales*100)/100).toFixed(2).replace('.',',')+' €'} bis zum ${moment(new Date(datum.getFullYear(),datum.getMonth()+2,0,12)).format('DD.MM.YYYY')} auf folgendes Konto:\n\n\t` +
-                            `IBAN: DE20150400680686090200\n\tBIC: COBADEFFXXX\n\n` +
-                            `Die gesamte Rechnung kannst du dir auf http://afternoon-sea-42864.herokuapp.com/members/bills herunterladen.\n\nMit freundlichem Gruß\nSnookerclub Neubrandenburg`
+                            `IBAN: DE20150400680686090200\n\tBIC: COBADEFFXXX\n\n`+
+                            `Die gesamte Rechnung kannst du dir mit einem Klick auf den folgenden Link herunterladen.\n`+
+                            `http://afternoon-sea-42864.herokuapp.com/data/bill/${user._id}/${user.bill._id}\n\n`+
+                            `Mit freundlichem Gruß\n
+                            Snookerclub Neubrandenburg`
                     };
                     smtpTransport.sendMail(mailOptions, function(err, info) {
                         if (err){
                             console.log(err);
                         }
                     });
-                    
                 } 
             });
             return;
