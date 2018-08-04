@@ -9,7 +9,7 @@ moment.locale('de');
 
 let datum = new Date(Date.UTC(new Date().getFullYear(),new Date().getMonth(),0,12));
 
-if (new Date().getDate()!==3) {
+if (new Date().getDate()!==4) {
     console.log('------ Heute ist nicht der 3. des Monats! -------');                
 }else{
     console.log('+++++++++++++++++++++  Sammle Daten für Emailversand ein...');
@@ -31,12 +31,14 @@ if (new Date().getDate()!==3) {
                     user.bill = rechnung;
                     var smtpTransport = nodemailer.createTransport({
                         service: 'gmail',
+                        port: 465,
+                        secure: true,
                         auth: {
-                        user: process.env.EMAIL_USER,
-                        pass: process.env.EMAIL_PASS
-                        },
-                        tls:{
-                            rejectUnauthorized:false
+                            type: 'OAuth2',
+                            user: process.env.EMAIL_USER,
+                            clientId: process.env.CLIENT_ID,
+                            clientSecret: process.env.CLIENT_SECRET,
+                            refreshToken: process.env.REFRESH_TOKEN
                         }
                     });
                     var mailOptions = {
@@ -56,6 +58,8 @@ if (new Date().getDate()!==3) {
                     smtpTransport.sendMail(mailOptions, function(err, info) {
                         if (err){
                             console.log(err);
+                        }else{
+                            return console.log(info);
                         }
                     });
                 } 

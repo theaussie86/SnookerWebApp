@@ -49,7 +49,9 @@ moment.locale('de');
                     smtpTransport.sendMail(mailOptions, function(err, info) {
                         if (err){
                             console.log(err);
-                        }
+                        } else {
+                            return console.log(info);
+                        }                        
                     });
     //             } 
     //         });
