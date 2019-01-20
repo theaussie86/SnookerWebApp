@@ -70,7 +70,7 @@ function getSales(queryParams, callback) {
 }
 
 function getParams(datum, callback) {
-    if (new Date().getDate() !== 20) return callback('------ Heute ist nicht der 3. des Monats! -------');
+    if (new Date().getDate() !== 3) return callback('------ Heute ist nicht der 3. des Monats! -------');
 
     let params = [];
     console.log('+++++++++++++++++++++  Sammle Daten ein...');
