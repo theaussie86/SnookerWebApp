@@ -1,51 +1,60 @@
 <header>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <a class="navbar-brand" href="/">Snookerclub Neubrandenburg</a>
-        <button class="navbar-toggler float-right" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler float-right" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
+            aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon float-right"></span>
         </button>
         <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
             <div class="navbar-nav">
                 <ul class="nav navbar-nav">
                     {{#if user}}
-                        <li class="nav-item">
-                            <a class="nav-link" id="dashboard-tab" href="/members" role="tab" aria-controls="Dashboard" aria-expanded="true">Dashboard</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" id="mübersicht-tab" href="/members/allmembers" role="tab" aria-controls="MitgliederÜbersicht" aria-expanded="true">Mitgliederübersicht</a>
-                        </li>                        
-                        {{#if user.isBoardMember}}
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" data-toggle="dropdown" data-target="#" href="#">Vorstand</a>
-                            <div class="dropdown-menu">
-                                <a class="dropdown-item" href="/board/bills" role="button" aria-controls="dropdown3">Rechnungen verwalten</a>
-                                <a class="dropdown-item" href="/board/members" role="button" aria-controls="dropdown2">Mitgliedschaften verwalten</a>
-                                <a class="dropdown-item" href="/board/register" role="button" aria-controls="dropdown6">Registrieren</a>
-                            </div>
-                        </li> 
-                        {{/if}}
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" data-toggle="dropdown" data-target="#" href="#">
-                                Hallo <span id="srtUser">{{user.username}}</span>
-                            </a>
-                            <div class="dropdown-menu">
-                                <a class="dropdown-item" href="/members/bills" role="button" aria-controls="Rechnungen">Meine Rechnungen</a>
-                                <a class="dropdown-item" href="/members/visitors" role="button" aria-controls="Gastspieler">Meine Gäste</a>
-                                <a class="dropdown-item" href="/members/breaks" role="button" aria-controls="Breaks">Meine Breaks</a>
-                                <a class="dropdown-item" href="/data/profile" role="button" aria-controls="Profil">Mein Profil</a>
-                                <a class="dropdown-item" href="/logout" role="button" aria-controls="Logout">Logout</a>
-                            </div>
-                        </li> 
+                    <li class="nav-item">
+                        <a class="nav-link" id="dashboard-tab" href="/members" role="tab" aria-controls="Dashboard"
+                            aria-expanded="true">Dashboard</a>
+                    </li>
+                    {{!-- <li class="nav-item">
+                        <a class="nav-link" id="mübersicht-tab" href="/members/allmembers" role="tab" aria-controls="MitgliederÜbersicht"
+                            aria-expanded="true">Mitgliederübersicht</a>
+                    </li> --}}
+                    {{#if user.isBoardMember}}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" data-toggle="dropdown" data-target="#" href="#">Vorstand</a>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="/board/bills" role="button" aria-controls="dropdown3">Rechnungen
+                                verwalten</a>
+                            <a class="dropdown-item" href="/board/members" role="button" aria-controls="dropdown2">Mitgliedschaften
+                                verwalten</a>
+                            <a class="dropdown-item" href="/board/register" role="button" aria-controls="dropdown6">Registrieren</a>
+                        </div>
+                    </li>
+                    {{/if}}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" data-toggle="dropdown" data-target="#" href="#">
+                            Hallo <span id="srtUser">{{user.username}}</span>
+                        </a>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="/members/bills" role="button" aria-controls="Rechnungen">Meine
+                                Rechnungen</a>
+                            <a class="dropdown-item" href="/members/visitors" role="button" aria-controls="Gastspieler">Meine
+                                Gäste</a>
+                            <a class="dropdown-item" href="/members/breaks" role="button" aria-controls="Breaks">Meine
+                                Breaks</a>
+                            <a class="dropdown-item" href="/data/profile" role="button" aria-controls="Profil">Mein
+                                Profil</a>
+                            <a class="dropdown-item" href="/logout" role="button" aria-controls="Logout">Logout</a>
+                        </div>
+                    </li>
                     {{else}}
-                        {{!-- <li class="nav-item">
-                            <a class="nav-link" href="/feature-one">Info</a>
-                        </li> --}}
-                        <li class="nav-item" href="/login">
-                            <a class="nav-link" id="login-tab" href="/login" role="tab" aria-controls="Login">Login</a>
-                        </li>
+                    {{!-- <li class="nav-item">
+                        <a class="nav-link" href="/feature-one">Info</a>
+                    </li> --}}
+                    <li class="nav-item" href="/login">
+                        <a class="nav-link" id="login-tab" href="/login" role="tab" aria-controls="Login">Login</a>
+                    </li>
 
                     {{/if}}
-                </ul>             
+                </ul>
             </div>
         </div>
     </nav>
