@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+
+<html >
+    {{> head}}
+    <body>
+    {{> header}}
+        <div id="members">
+            <div class="row">
+                <div class="col-lg-3 col-md-4">
+                    {{> sidebar}}
+                </div>
+                <div class="col-lg-9 col-md-8">
+                    <div class="jumbotron" id="members-caption">
+                        {{> alerts}}                        
+                        <div class="tab-content d-block" id="myTabContent">
+                            <div class="tab-pane fade show active" id="dashboard" role="tabpanel" aria-labelledby="dashboard-tab">
+                                <h4>Übersicht</h4> 
+                                <hr>
+                                <div class="row d-flex justify-content-around m-2">
+                                    <div class="col-xs-6">
+                                        <h6>Letzten Gastspieler</h6>
+                                        <table class="table table-border">
+                                        <thead>
+                                            <tr>
+                                            <th>Datum</th>
+                                            <th>Spieler 1</th>
+                                            <th>Spieler 2</th>
+                                            <th>Spielzeit</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="latestVisitors">
+                                        </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="col-xs-4">
+                                        <h6>Einnahmen Gastspieler</h6>
+                                        <ul id="Kennzahlen" class="list-unstyled">
+                                            {{!-- <li id="thisMonth">Umsatz Gastspieler diesen Monat: </li>
+                                            <li id="lastMonth">Umsatz Gastspieler letzten Monat: </li>
+                                            <li id="lastLMonth">Umsatz Gastspieler letzten Monat: </li> --}}
+                                        </ul>
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="row d-flex justify-content-around">
+                                    <div class="col-xs-5">
+                                        <h6>Highest Breaks</h6>
+                                        <table class="table table-border">
+                                        <thead>
+                                            <tr>
+                                            <th>Rang</th>
+                                            <th>Datum</th>
+                                            <th>Spieler</th>
+                                            <th>Break</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="highBreaks">
+                                        </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="col-xs-5">
+                                        <h6>Latest Breaks</h6>
+                                        <table class="table table-border float-right">
+                                        <thead>
+                                            <tr>
+                                            <th>Datum</th>
+                                            <th>Spieler</th>
+                                            <th>Break</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="latestBreaks">
+                                        </tbody>
+                                        </table>
+                                    </div>
+                                </div>                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{> footer}}
+        </div>
+
+
+        <!-- Optional JavaScript -->
+
+        {{> scripts}}
+        <!-- Additional JavaScript -->
+        <script type="text/javascript" src="js/members.js"></script>
+    </body>
+</html>

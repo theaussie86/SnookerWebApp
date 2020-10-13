@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+
+<html >
+    {{> head}}
+    <body>
+    {{> header}}
+        <div id="members">
+            <div class="row">
+                <div class="col-lg-3 col-md-4">
+                    {{> sidebar}}
+                </div>
+                <div class="col-lg-9 col-md-8">
+                    <div class="jumbotron" id="members-caption">
+                        {{#if user.isBoardMember}}
+                        <div class="row" id="headerrow">
+                            <div class="col-4 form-check">
+                            <label class="form-check-label">
+                                <input class="form-check-input" id="checkBreak" type="checkbox" value="">
+                                Alle Breaks verwalten
+                            </label>
+                            </div>
+                            <div id="divCboPlayer" class="col-4 form-group" style="display: none">
+                            <select id="cboPlayer" class="custom-select d-block my-3">
+                                <option value="0">Spieler auswählen</option>
+                            </select>
+                            </div>                        
+                        </div>
+                        {{/if}}
+                        {{> alerts}}
+                        <div class="container">
+                            <p>
+                                <h5 id="heading">Meine Breaks</h5>
+                            </p>
+                            <table class="table table-border table-light">
+                            <thead>
+                                <tr>
+                                <th>Rang</th>
+                                <th>Datum</th>
+                                <th>Spieler</th>
+                                <th>Break</th>
+                                </tr>
+                            </thead>
+                            <tbody id="myBreaks">
+                                {{#if breaks}}
+                                {{#each breaks}}
+                                <tr>
+                                <th>{{inc @index}}.</th>
+                                <td>{{formatDate datum}}</td>
+                                <td>{{player}}</td>
+                                <td>{{break}}</td>
+                                </tr>                                
+                                {{/each}}
+                                {{/if}}
+                            </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{> footer}}
+        </div>
+
+
+        <!-- Optional JavaScript -->
+        
+        {{> scripts}}
+        <script type="text/javascript" src="/js/breaks.js"></script>
+        <!-- Additional JavaScript -->
+    </body>
+</html>

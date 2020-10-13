@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+
+<html >
+    {{> head}}
+    <body>
+    {{> header}}
+
+    <div id="stage">
+        <div class="container-fluid" id="stage-caption">
+            <div id="formContainer" class="container-fluid p-2 rounded col-10 col-md-6">
+                <form id="downloadForm" method="GET" action="/board/makebills"> 
+                    <div class="form-group">
+                        <h4>Rechnungen verwalten</h4>
+                        <hr>
+                        {{> alerts}}
+                        <label for="datum" class="form-control-label float-left text-secondary">Monat:</label>
+                        <select class="form-control" name="month" id="cbomonth"autofocus>
+                            <option value="0">Wähle einen Monat aus</option>
+                            <option value="1">Januar</option>
+                            <option value="2">Februar</option>
+                            <option value="3">März</option>
+                            <option value="4">April</option>
+                            <option value="5">Mai</option>
+                            <option value="6">Juni</option>
+                            <option value="7">Juli</option>
+                            <option value="8">August</option>
+                            <option value="9">September</option>
+                            <option value="10">Oktober</option>
+                            <option value="11">November</option>
+                            <option value="12">Dezember</option>
+                        </select>
+                        <label for="spieler" class="form-control-label float-left text-secondary">Jahr:</label>
+                        <select class="form-control" name="year" id="cboyear">
+                            <option value="0">Wähle ein Jahr aus</option>
+                        </select>
+                        <hr>
+                        <button id="summarize" class="btn btn-info">Schreiben</button>
+                        <button id="download" class="btn btn-success">Herunterladen</button>
+                        <button id="sendmails" class="btn btn-info">Senden</button>
+                    </div>
+                </form> 
+            </div>
+        </div>
+    </div>
+
+    {{> footer}}
+    {{> scripts}}
+        <!-- Optional JavaScript -->
+        <script type="text/javascript" src="/js/jspdf.min.js"></script>
+        <script type="text/javascript" src="/js/printbill.js"></script>
+        <script type="text/javascript" src="/js/download.js"></script>
+    </body>
+</html>

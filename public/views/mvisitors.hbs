@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+
+<html >
+    {{> head}}
+    <body>
+    {{> header}}
+
+        <div id="members">
+            <div class="row">
+                <div class="col-lg-3 col-md-4">
+                    {{> sidebar}}
+                </div>
+                <div class="col-lg-9 col-md-8">
+                    <div class="jumbotron" id="members-caption">
+                        {{#if umsatz}}
+                        <div class="row">
+                            <div class="col-4">
+                            <select id="month" class="custom-select d-block my-3">
+                                <option value="0">Monat auswählen</option>
+                                <option value="1">Januar</option>
+                                <option value="2">Februar</option>
+                                <option value="3">März</option>
+                                <option value="4">April</option>
+                                <option value="5">Mai</option>
+                                <option value="6">Juni</option>
+                                <option value="7">Juli</option>
+                                <option value="8">August</option>
+                                <option value="9">September</option>
+                                <option value="10">Oktober</option>
+                                <option value="11">November</option>
+                                <option value="12">Dezember</option>
+                            </select>
+                            </div>
+                            <div class="col-4">
+                            <select id="year" class="custom-select d-block my-3">
+                                <option value="0">Jahr auswählen</option>
+                            </select>
+                            </div>
+                            <div class="col-2"><p class="align-bottom">Summe der Umsätze: <br><strong id="Umsatzsumme">{{formatCurrency umsatz}}</strong></p></div>
+                            {{#if user.isBoardMember}}
+                            <div class="col-2 form-check">
+                            <label class="form-check-label">
+                                <input class="form-check-input" id="checkAllVisitors" type="checkbox" value="">
+                                Alle Umsätze verwalten
+                            </label>
+                            </div>
+                            {{/if}}
+                        </div>
+                        {{/if}}
+                        {{> alerts}}                        
+                        <p><h5 id="heading">Meine Umsätze mit Gastspielern</h5></p>
+                        <table class="table table-border">
+                        <thead>
+                            <tr>
+                            <th>Datum</th>
+                            <th>Spieler</th>
+                            <th>Spielzeit</th>
+                            <th>Rechnungsbetrag</th>
+                            </tr>
+                        </thead>
+                        <tbody id="myVisitors">
+                            {{#each rents}}
+                            <tr>
+                            <td>{{formatDate datum}}</td>
+                            <td>{{player}}</td>
+                            <td>{{spielzeit}}</td>
+                            <td>{{formatCurrency betrag}}</td>
+                            </tr>
+                            {{/each}}
+                        </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {{> footer}}
+        </div>
+
+
+        <!-- Optional JavaScript -->
+
+        {{> scripts}}
+        <!-- Additional JavaScript -->
+        <script type="text/javascript" src="/js/visitors.js"></script>
+    </body>
+</html>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+
+<html >
+    {{> head}}
+    <body>
+    {{> header}}
+        <div id="members">
+            <div class="row">
+                <div class="col-lg-3 col-md-4">
+                    {{> sidebar}}
+                </div>
+                <div class="col-lg-9 col-md-8">
+                    <div class="jumbotron" id="members-caption">
+                        {{> alerts}}                        
+                        <div class="tab-content d-block" id="myTabContent">
+                            <div class="tab-pane fade show active" id="dashboard" role="tabpanel" aria-labelledby="dashboard-tab">
+                                <form id="profileform" method="POST">
+                                    <div class="form-row">
+                                        <div class="form-group col-md-4">
+                                        <label for="username">Username</label>
+                                        <input type="text" class="form-control change" name="username" id="username" placeholder="{{user.username}}" readonly>
+                                        </div>
+                                        <div class="form-group col-md-4">
+                                        <label for="vorname">Vorname</label>
+                                        <input type="text" class="form-control" id="vorname" placeholder="{{user.firstname}}" readonly>
+                                        </div>
+                                        <div class="form-group col-md-4">
+                                        <label for="nachname">Nachname</label>
+                                        <input type="text" class="form-control" id="nachname" placeholder="{{user.lastname}}" readonly>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="form-group">
+                                        <label for="email">Emailadresse</label>
+                                        <input type="email" class="form-control change" name="email" id="email" placeholder="{{user.email}}" readonly>
+                                        <label for="handy">Handynummer</label>
+                                        <input type="text" class="form-control change" name="handy" id="handy" placeholder="{{user.handy}}" readonly>
+                                      </div>
+                                    <hr>
+                                    <div class="form-group">
+                                        <div class="form-row">
+                                            <div class="form-group col-md-12">
+                                                <label for="strasse">Straße</label>
+                                                <input type="text" class="form-control change" name="strasse" id="strasse" placeholder="{{user.street}}" readonly>
+                                            </div>
+                                        </div>
+                                         <div class="form-row">
+                                            <div class="form-group col-md-4">
+                                                <label for="plz">Postleitzahl</label>
+                                                <input type="text" class="form-control change" name="plz" id="plz" placeholder="{{user.zip}}" readonly>
+                                            </div>
+                                            <div class="form-group col-md-8">
+                                                <label for="ort">Wohnort</label>
+                                                <input type="text" class="form-control change" name="ort" id="ort" placeholder="{{user.city}}" readonly>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-inline">
+                                        <button type="button" id="change" class="btn btn-primary m-1">Ändern</button>
+                                        <button type="button" id="profilbild" class="btn btn-primary m-1" data-toggle="modal" data-target="#picModal">Profilbild Ändern</button>                                        
+                                        </div>
+                                    </div>                                    
+                                </form>
+                                <hr>
+                                <div class="form-check">
+                                    <label class="form-check-label">
+                                    <input type="checkbox" class="form-check-input" id="sharedetails" {{#if user.sharedetails}}checked{{/if}}>
+                                    meine Kontaktdaten im Mitgliederverzeichnis anzeigen
+                                    </label>
+                                </div>
+                                <hr>
+                                <div class="row">
+                                    <p>
+                                        <h5>Mitgliedschaften</h5>
+                                    </p>
+                                    <table id="membershipsTable" class="table table-border table-dark rounded">
+                                    <thead>
+                                        <tr>
+                                        <th>Mitgliedschaft</th>
+                                        <th>Beitrag</th>
+                                        <th>Start</th>
+                                        <th>Ende</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="myMemberships">
+                                        {{#each user.memberships}}
+                                        <tr>
+                                        <td>{{membershipType}}</td>
+                                        <td>{{formatCurrency membershipFee}}</td>
+                                        <td>{{formatDate membershipStart}}</td>
+                                        <td>{{formatDate membershipEnd}}</td>
+                                        </tr>
+                                        {{/each}}
+                                    </tbody>
+                                    </table>
+                                </div>                              
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{> footer}}
+        </div>
+        <div class="modal fade" id="picModal" tabindex="-1" role="dialog" aria-labelledby="picModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="picModalLabel">Profilbild hochladen</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="pic"></div>
+                <form action="/upload" method="POST" enctype="multipart/form-data">
+                    <div class="input-group">
+                        <span class="input-group-btn">
+                            <span class="btn btn-default btn-file">
+                            <input type="file" name="uploadPic" id="uploadPic">
+                            </span>
+                        </span>
+                        <button type="subit" class="btn btn-primary">Speichern</button>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Schließen</button>
+            </div>
+
+            </div>
+        </div>
+        </div>
+
+        <!-- Optional JavaScript -->
+
+        {{> scripts}}
+        <!-- Additional JavaScript -->
+        <script type="text/javascript" src="/js/profil.js"></script>
+    </body>
+</html>

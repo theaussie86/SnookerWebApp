@@ -1,0 +1,7 @@
+node_modules
+package-lock.json
+server/config/config.json
+server.log
+playground
+tasks/delete-bills.js
+export.txt

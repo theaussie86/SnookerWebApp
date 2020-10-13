@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+
+<html >
+    {{> head}}
+    <body>
+    {{> header}}
+        <div id="board">
+            <div class="row">
+                <div class="col-lg-3 col-md-4">
+                    {{> sidebar}}
+                </div>
+                <div class="col-lg-9 col-md-8">
+                    <div class="jumbotron" id="board-caption">
+                        <div id= "filter" class="row justify-content-around">
+                            <div class="col-3">
+                            <select id="cbomonth" class="custom-select d-block my-3">
+                                <option value="0">Monat auswählen</option>
+                                <option value="1">Januar</option>
+                                <option value="2">Februar</option>
+                                <option value="3">März</option>
+                                <option value="4">April</option>
+                                <option value="5">Mai</option>
+                                <option value="6">Juni</option>
+                                <option value="7">Juli</option>
+                                <option value="8">August</option>
+                                <option value="9">September</option>
+                                <option value="10">Oktober</option>
+                                <option value="11">November</option>
+                                <option value="12">Dezember</option>
+                            </select>
+                            </div>
+                            <div class="col-3">
+                            <select id="cboyear" class="custom-select d-block my-3">
+                                <option value="0">Jahr auswählen</option>
+                            </select>
+                            </div>
+                            <div class="col-3">
+                            <select id="cbomembers" class="custom-select d-block my-3">
+                                <option value="0">Mitglied auswählen</option>
+                                {{#each names}}
+                                <option value="{{this}}">{{this}}</option>
+                                {{/each}}
+                            </select>
+                            </div>
+                        </div>
+                        {{> alerts}}
+                        <p><h5>Alle Rechnungen</h5></p>
+                        <table class="table table-border table-hover rounded">
+                        <thead>
+                            <tr>
+                            <th>Datum</th>
+                            <th>Spieler</th>
+                            <th>Gäste</th>
+                            <th>Beitrag</th>
+                            </tr>
+                        </thead>
+                        <tbody id="allBills">
+                            {{#each bills}}
+                            <tr data-toggle="modal" data-target="#billModal">
+                            <td>{{formatMonthYear billDate}}</td>
+                            <td>{{username}}</td>
+                            <td>{{formatCurrency visitorsSales}}</td>
+                            <td>{{formatCurrency membershipFee}}</td>
+                            </tr>
+                            {{/each}}
+                        </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="billModal" tabindex="-1" role="dialog" aria-labelledby="billModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="billModalLabel"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+
+                    <div class="row my-2">
+                        <div id="lblvisitors" class="col-md-4 font-weight-bold">Gastumsatz:</div>
+                        <div id="visitors" class="col-md-4 ml-auto font-weight-bold"></div>
+                        <div class="col-md-4"><input type="checkbox" name="salesPaid" id="salesPaid">Gastumsatz bezahlt</div>
+                    </div>
+                    <div class="row align-items-end">
+                        <div id="lblBeitrag" class="col-md-4 font-weight-bold">Beitrag:</div>
+                        <div id="beitrag" class="col-md-4 ml-auto font-weight-bold"></div>
+                        <div class="col-md-4 ml-auto"><input type="checkbox" name="feePaid" id="feePaid">Beitrag bezahlt</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="editBill" type="button" class="btn btn-primary" data-dismiss="modal">Speichern</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Schließen</button>
+            </div>
+            </div>
+        </div>
+        </div>
+    {{> footer}}
+        <!-- Optional JavaScript -->
+    {{> scripts}}
+    <script type="text/javascript" src="/js/boardbills.js"></script>
+    </body>
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+
+<html >
+    {{> head}}
+    <body>
+    {{> header}}
+
+    <div id="stage">
+        <div class="container-fluid" id="stage-caption">
+            <div id="formContainer" class="container-fluid p-2 rounded col-10 col-md-6">
+                <form id="visitorform" method="POST"> 
+                    <div class="form-group">
+                        <h4>Gast abrechnen</h4>
+                        <hr>
+                        {{> alerts}}
+                        <label for="datum" class="form-control-label float-left text-secondary">Datum:</label>
+                        <input type="date" class="form-control" name="datum" id="datum" required autofocus></input>
+                        <div class="form-row">
+                        <div class="form-check">
+                            <label for="onlyguests" class="form-check-label float-left text-secondary" data-toggle="tooltip" data-placement="bottom" title="Aktivieren wenn beide Spieler Gäste waren!">
+                                <input type="checkbox" class="form-check-input" value="onlyGuests" name="onlyGuests" id="onlyguests">
+                                Nur Gäste?
+                            </label>
+                        </div>
+                        </div>
+                        <label for="spieler1" class="form-control-label float-left text-secondary">Spieler 1:</label>
+                        <input type="text" class="form-control" name="player1" id="spieler1" placeholder="{{user.username}}" required readonly>
+                        <label for="spieler2" class="form-control-label float-left text-secondary">Spieler 2:</label>
+                        <input type="text" class="form-control" name="player2" id="spieler2" placeholder="Mit wem hast du gespielt?" required>
+                        <div class="form-row">
+                            <div class="col-6">
+                                <label for="start" class="form-control-label float-left text-secondary">Start:</label>
+                                <input type="time" class="form-control" name="start" id="start" placeholder="Wann habt ihr angefangen?" required>
+                            </div>
+                            <div class="col-6">
+                                <label for="ende" class="form-control-label float-left text-secondary">Ende:</label>
+                                <input type="time" class="form-control" name="ende" id="ende" placeholder="Wann habt ihr aufgehört?" required>
+                            </div>
+                        </div>
+                        <hr>
+                        <button type="submit" class="btn btn-success">Speichern</button>
+                    </div>
+                </form> 
+            </div>
+        </div>
+    </div>
+
+    {{> footer}}
+    {{> scripts}}
+        <!-- Optional JavaScript -->
+        <script type="text/javascript" src="/js/entervisitors.js"></script>
+    </body>
+</html>

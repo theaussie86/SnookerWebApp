@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+
+<html >
+    {{> head}}
+    <body>
+    {{> header}}
+
+    <div id="stage">
+        <div class="container-fluid" id="stage-caption">
+            <div id="formContainer" class="container-fluid p-2 rounded col-10 col-md-6 col-lg-4">
+                <form id="loginform" method="POST"> 
+                    <div class="form-group">
+                        <h4>Neues Password Eingeben</h4>
+                        <hr>
+                        {{> alerts}}
+                        <label for="password" class="form-control-label float-left text-secondary">Passwort:</label>
+                        <input type="password" class="form-control" name="password" id="password" placeholder="Passwort"></input>
+                        <label for="password2" class="form-control-label float-left text-secondary">Passwort bestätigen:</label>
+                        <input type="password" class="form-control" name="password2" id="password2" placeholder="Passwort erneut eingeben"></input>
+                        <hr>
+                        <button type="submit" class="btn btn-success">Passwort Ändern</button>
+                    </div>
+                </form> 
+            </div>
+        </div>
+    </div>
+
+    {{> footer}}
+        <!-- Optional JavaScript -->
+    {{> scripts}}
+    </body>
+</html>

@@ -1,0 +1,35 @@
+{{#if user}}
+<div class="jumbotron">
+
+    <h5>Profil</h5>
+    {{#if user.bild}}
+    <div class="image">
+        <img id="profilbild" src="/img/{{user.bild}}"/>
+    </div>
+    {{else}}
+    <div class="image-upload">
+    <label for="file-input">
+        <img src="/img/placeholder.png"/>
+    </label>
+    </div>
+    {{!-- <input type="file" name="img" id="file-input" accept=".png,.jpg,.jpeg,.gif,.tif" /> --}}
+    {{!-- <form action="" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" enctype="multipart/form-data"></input>
+    </form> --}}
+    {{!-- <img src="/img/ntcmUnterschrift.jpg"> --}}
+    {{/if}}
+    <ul class="list-unstyled">
+        <li id="username">Username: {{user.username}}</li>
+        {{#if user.isBoardMember}}
+        <li>Du bist im Vorstand</li>
+        {{/if}}
+    </ul>
+</div>
+{{/if}}
+<div class="btn-group-vertical d-block" role="group" aria-label="Button group with nested dropdown">
+    <a href="/data/entervisitor"><button type="button" class="btn btn-secondary">Gäste abrechnen</button></a>
+    <a href="/data/enterbreak"><button type="button" class="btn btn-secondary">Breaks eintragen</button></a>
+    {{#if board}}
+    <a href="/board/downloadbills"><button type="button" class="btn btn-secondary">Rechnungen erstellen</button></a>
+    {{/if}}
+</div>
