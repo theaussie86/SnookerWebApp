@@ -1,7 +1,10 @@
 node_modules
 package-lock.json
 server/config/config.json
+server/config/credentials.json
 server.log
 playground
 tasks/delete-bills.js
+tasks/update-test.js
+tasks/update-bills_old.js
 export.txt
