@@ -4,20 +4,24 @@ const moment = require('moment');
 const _ = require('lodash');
 const nodemailer = require('nodemailer');
 const { MongoClient, ObjectID } = require('mongodb');
+const MongoOptions = {
+    useUnifiedTopology: true,
+    useNewUrlParser: true
+}
+const dbName = 'SnookerClubDb'
 
 moment.locale('de');
 
 let datum = new Date(Date.UTC(new Date().getFullYear(), new Date().getMonth(), 0, 12));
 
-if (new Date().getDate() !== 3) {
+if (new Date().getDate() !== 3 && false) {
     console.log('------ Heute ist nicht der 3. des Monats! -------');
 } else {
     console.log('+++++++++++++++++++++  Sammle Daten für Emailversand ein...');
-    MongoClient.connect(process.env.MONGODB_URI, (err, db) => {
+    MongoClient.connect(process.env.MONGODB_URI, MongoOptions, (err, client) => {
         if (err) return console.log('Unable to connect to MongoDB server.');
 
-
-        db.collection('users').find({}).toArray().then((users) => {
+        client.db(dbName).collection('users').find({}).toArray().then((users) => {
             users = users.filter((x) => {
                 return x.memberships.findIndex((x) => {
                     return (x.membershipStart <= datum && x.membershipEnd.getTime() === 0) || (x.membershipStart < datum && x.membershipEnd >= datum)
@@ -64,9 +68,10 @@ if (new Date().getDate() !== 3) {
                             return console.log(info);
                         }
                     });
+                    // console.log(user.username, user.bill)
                 }
             });
-            return;
+            client.close()
         }).catch((e) => console.log(e));
     });
 }

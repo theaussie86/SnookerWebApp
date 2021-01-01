@@ -41,7 +41,8 @@
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
     "popper.js": "^1.12.5",
-    "validator": "^8.2.0"
+    "validator": "^8.2.0",
+    "yargs": "^16.2.0"
   },
   "devDependencies": {
     "nodemon": "^1.12.1"

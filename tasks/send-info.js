@@ -4,15 +4,20 @@ const moment = require('moment');
 const _ = require('lodash');
 const nodemailer = require('nodemailer');
 const { MongoClient, ObjectID } = require('mongodb');
+const MongoOptions = {
+    useUnifiedTopology: true,
+    useNewUrlParser: true
+}
+const dbName = 'SnookerClubDb'
 
 moment.locale('de');
 
 // let datum = new Date(Date.UTC(new Date().getFullYear(),new Date().getMonth(),0,12));
 
-MongoClient.connect(process.env.MONGODB_URI, (err, db) => {
+MongoClient.connect(process.env.MONGODB_URI, MongoOptions, (err, client) => {
     if (err) return console.log('Unable to connect to MongoDB server.');
 
-    db.collection('users').find({ username: 'Murat' }).toArray().then((users) => {
+    client.db(dbName).collection('users').find({ username: 'Murat' }).toArray().then((users) => {
         users = users.filter((x) => {
             return (x.aktiv || x.isBoardMember);
         }).forEach((user) => {
